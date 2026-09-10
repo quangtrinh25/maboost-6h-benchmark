@@ -1,0 +1,218 @@
+{
+  "schema_version": "2.0.0",
+  "analysis_plan_sha256": "d5e7f3303e7284d855e2ddea008e905a9c7af7525a59e30b68ec0ea2dc4fadd2",
+  "landmark_hours": 6.0,
+  "sequence_length": 96,
+  "minimum_age_years": 65,
+  "datasets": {
+    "mimic_iv": {
+      "release": "3.1",
+      "raw_root": "data/raw/mimiciv",
+      "private_root": "benchmark/private/processed/mimic_iv"
+    },
+    "eicu": {
+      "release": "2.0",
+      "raw_root": "data/raw/eicu",
+      "private_root": "benchmark/private/processed/eicu"
+    },
+    "mimic_iii_carevue": {
+      "release": "1.4",
+      "raw_root": "data/raw/mimic3-carevue/1.4",
+      "private_root": "benchmark/private/processed/mimic_iii_carevue"
+    }
+  },
+  "seeds": [
+    42,
+    137,
+    2025,
+    2718,
+    31415
+  ],
+  "splits": {
+    "unit": "patient",
+    "train_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "test_fraction": 0.2,
+    "label_stratification": false,
+    "target_partitioning": "none_full_fixed_risk_set"
+  },
+  "models": [
+    "MABOOST",
+    "Hybrid-plain",
+    "Mamba-z-only",
+    "Flat-head",
+    "XGBOOST-FLAT",
+    "XGBOOST-SUMMARY+STATIC",
+    "GRU-D",
+    "LSTM",
+    "Transformer",
+    "TCN",
+    "SAnD",
+    "STraTS",
+    "InterpNet",
+    "DuETT"
+  ],
+  "source_directions": {
+    "mimic_iv": [
+      "eicu",
+      "mimic_iii_carevue"
+    ],
+    "eicu": [
+      "mimic_iv",
+      "mimic_iii_carevue"
+    ]
+  },
+  "matched_augmentation": {
+    "models": [
+      "XGBOOST-FLAT",
+      "XGBOOST-SUMMARY+STATIC",
+      "Hybrid-plain",
+      "MABOOST"
+    ],
+    "regimes": [
+      "full_only",
+      "stress_augmented"
+    ],
+    "views": [
+      "full_6h",
+      "early_2h",
+      "early_4h",
+      "random_window_2h",
+      "event_budget_4",
+      "important_lab_loss",
+      "feature_dropout_30pct"
+    ],
+    "group_weights": {
+      "full": 0.25,
+      "early": 0.3,
+      "irregular": 0.25,
+      "missing": 0.2
+    },
+    "max_train_rows_per_view": 25000,
+    "max_validation_rows_per_view": 12000,
+    "max_total_rows": 600000,
+    "minimum_free_cache_bytes": 5000000000,
+    "disk_backed_cache": true,
+    "selection_metric": "source_validation_pooled_stress_auprc"
+  },
+  "stress_scenarios": [
+    "full_6h",
+    "early_0_5h",
+    "early_1h",
+    "early_2h",
+    "early_3h",
+    "early_4h",
+    "early_5h",
+    "random_prefix",
+    "random_window_1h",
+    "random_window_2h",
+    "random_window_4h",
+    "event_budget_1",
+    "event_budget_2",
+    "event_budget_4",
+    "event_budget_8",
+    "event_budget_16",
+    "event_budget_32",
+    "event_budget_64",
+    "sparse",
+    "dense",
+    "low_gap_variance",
+    "high_gap_variance",
+    "important_lab_loss",
+    "lab_panel_dropout",
+    "feature_dropout_30pct",
+    "event_dropout_50pct",
+    "delayed_update_2h",
+    "late_only_5_to_6h"
+  ],
+  "training": {
+    "mamba": {
+      "d_model": 128,
+      "d_state": 32,
+      "d_conv": 4,
+      "expand": 2,
+      "n_layers": 4,
+      "n_heads": 4,
+      "dropout": 0.1,
+      "event_max_tokens": 96,
+      "batch_size": 32,
+      "learning_rate": 0.0002,
+      "weight_decay": 0.0001,
+      "max_epochs": 150,
+      "early_stopping_patience": 30,
+      "longitudinal_training": true,
+      "minimum_anchor_hours": 2.0,
+      "maximum_anchors_per_stay": 4,
+      "use_mixup": true,
+      "mixup_alpha": 0.4,
+      "warmup_fraction": 0.1,
+      "ema_decay": 0.999,
+      "focal_gamma": 2.0,
+      "los_loss_weight": 0.5,
+      "clip_norm": 1.0
+    },
+    "deep_baselines": {
+      "hidden_dim": 256,
+      "num_layers": 2,
+      "num_heads": 4,
+      "dropout": 0.1,
+      "batch_size_default": 32,
+      "batch_size_strats": 16,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "max_epochs": 50,
+      "early_stopping_patience": 10
+    },
+    "xgboost": {
+      "n_estimators": 500,
+      "max_depth": 5,
+      "learning_rate": 0.05,
+      "subsample": 0.8,
+      "colsample_bytree": 0.8,
+      "min_child_weight": 3,
+      "reg_lambda": 1.0,
+      "tree_method": "hist",
+      "device": "cuda",
+      "mortality_eval_metric": "aucpr",
+      "mortality_early_stopping_rounds": 50,
+      "los_objective": "reg:pseudohubererror",
+      "los_eval_metric": "rmse",
+      "los_early_stopping_rounds": 50
+    }
+  },
+  "selection": {
+    "fusion_components": [
+      "Hybrid-plain",
+      "XGBOOST-FLAT",
+      "Flat-head"
+    ],
+    "fusion_simplex_step": 0.05,
+    "mortality_metric": "source_validation_pooled_stress_auprc",
+    "los_metric": "source_validation_mae",
+    "mortality_calibration": "isotonic_source_validation_only",
+    "threshold": "youden_j_source_validation_only"
+  },
+  "statistics": {
+    "bootstrap_replicates": 10000,
+    "permutation_replicates": 10000,
+    "cluster_unit": "patient",
+    "minimum_subgroup_stays": 100,
+    "minimum_subgroup_events": 20
+  },
+  "guardian": {
+    "enabled": true,
+    "poll_seconds": 2.0,
+    "ram_soft_fraction": 0.85,
+    "ram_critical_fraction": 0.95,
+    "soft_cooldown_seconds": 30.0,
+    "status_heartbeat_seconds": 2.0,
+    "vram_process_fraction": 0.95,
+    "critical_exit_code": 86
+  },
+  "gates": {
+    "smoke_seed": 42,
+    "full_launch_requires_approval": false,
+    "manuscript_modification": false,
+    "execution_owner": "reproducing_user"
+  }
+}

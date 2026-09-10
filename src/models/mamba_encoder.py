@@ -1,0 +1,367 @@
+"""
+src/models/mamba_encoder.py
+============================
+MaBoost encoder v8 — Event-Token + Mamba (event_token_mode only).
+The SCI/CCI/GRUDImputer interpolation path has been removed.
+All public function names and signatures unchanged.
+"""
+from __future__ import annotations
+import math
+from typing import Optional, Tuple
+
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from mamba_ssm import Mamba
+
+
+def _register_nan_hooks(module: nn.Module) -> None:
+    for m in module.modules():
+        if isinstance(m, Mamba):
+            for p in m.parameters():
+                p.register_hook(
+                    lambda g: torch.nan_to_num(g, nan=0.0, posinf=0.0, neginf=0.0)
+                    if g is not None else g
+                )
+
+
+
+class TimeEmbedding(nn.Module):
+    def __init__(self, d_out: int, use_circadian: bool = True):
+        super().__init__()
+        self.use_circadian = use_circadian
+        self.gap_net = nn.Sequential(
+            nn.Linear(1, d_out), nn.SiLU(), nn.Linear(d_out, d_out)
+        )
+        if use_circadian:
+            self.circ_proj = nn.Linear(4, d_out, bias=False)
+
+    def forward(self, tau: torch.Tensor,
+                t_abs: Optional[torch.Tensor] = None) -> torch.Tensor:
+        tau_h = (tau / 3600.0).clamp(min=1e-4)
+        out   = self.gap_net(torch.log1p(tau_h).unsqueeze(-1))
+        if self.use_circadian and t_abs is not None:
+            hour = (t_abs / 3600.0) % 24.0
+            dow  = (t_abs / 86400.0) % 7.0
+            circ = torch.stack([
+                torch.sin(2 * math.pi * hour / 24.0),
+                torch.cos(2 * math.pi * hour / 24.0),
+                torch.sin(2 * math.pi * dow  /  7.0),
+                torch.cos(2 * math.pi * dow  /  7.0),
+            ], dim=-1)
+            out = out + self.circ_proj(circ)
+        return out
+
+
+class MambaBlock(nn.Module):
+    def __init__(self, d_model: int, d_state: int = 16,
+                 d_conv: int = 4, expand: int = 2, dropout: float = 0.1):
+        super().__init__()
+        self.norm      = nn.LayerNorm(d_model)
+        self.mamba     = Mamba(d_model=d_model, d_state=d_state,
+                               d_conv=d_conv, expand=expand)
+        self.log_decay = nn.Parameter(torch.full((d_model,), -3.0))
+        self.drop      = nn.Dropout(dropout)
+
+    def forward(self, x: torch.Tensor, tau: torch.Tensor) -> torch.Tensor:
+        h     = self.mamba(self.norm(x).float()).to(x.dtype)
+        tau_h = (tau / 3600.0).clamp(min=1e-4).unsqueeze(-1)
+        gate  = torch.exp(-F.softplus(self.log_decay) * tau_h)
+        return x + self.drop(h * gate)
+
+
+class MultiResolutionPooling(nn.Module):
+    def __init__(self, d: int):
+        super().__init__()
+        self.W    = nn.Linear(d, d // 2)
+        self.u    = nn.Linear(d // 2, 1, bias=False)
+        self.proj = nn.Linear(d * 4, d)
+
+    def _valid_mask(self, mask, B, L, device):
+        if mask is None:
+            return torch.ones(B, L, device=device)
+        return (mask.max(-1).values > 0).float() if mask.dim() == 3 else (mask > 0).float()
+
+    def forward(self, h, mask=None):
+        return self.proj(self._pool_all(h, mask))
+
+    def extract(self, h, mask=None):
+        return self._pool_all(h, mask)
+
+    def _pool_all(self, h, mask=None):
+        B, L, d  = h.shape
+        valid    = self._valid_mask(mask, B, L, h.device)
+        last_idx = (valid * torch.arange(L, device=h.device).float()).argmax(dim=1)
+        h_last   = h[torch.arange(B), last_idx]
+        n_obs    = valid.sum(dim=1, keepdim=True).clamp(min=1)
+        h_mean   = (h * valid.unsqueeze(-1)).sum(dim=1) / n_obs
+        h_masked = h.masked_fill(valid.unsqueeze(-1).expand_as(h) == 0, float("-inf"))
+        h_max    = torch.nan_to_num(h_masked.max(dim=1).values, neginf=0.0)
+        scores   = self.u(torch.tanh(self.W(h)))
+        scores   = scores.masked_fill((valid == 0).unsqueeze(-1), float("-inf"))
+        alpha    = torch.softmax(scores, dim=1)
+        if torch.isnan(alpha).any():
+            alpha = torch.where(torch.isnan(alpha),
+                                alpha.new_full(alpha.shape, 1.0 / L), alpha)
+        h_attn = (alpha * h).sum(dim=1)
+        return torch.cat([h_last, h_mean, h_max, h_attn], dim=-1)
+
+
+class MambaEncoder(nn.Module):
+    """
+    ICU encoder v8: x(B,T,F), tau(B,T) → z_T(B,d)
+    Event-token mode only. Public API identical to v7.
+    """
+    def __init__(self, d_input: int, d_model: int = 128, d_state: int = 16,
+                 d_conv: int = 4, expand: int = 2, n_layers: int = 3,
+                 n_heads: int = 4, dropout: float = 0.1, topk: int = 5,
+                 use_circadian: bool = True,
+                 ref_points: int = 32, window_hours: float = 48.0,
+                 event_token_mode: bool = True,
+                 event_max_tokens: int = 96):
+        super().__init__()
+        self.d_input    = d_input
+        self.event_token_mode = True   # always on; kept for checkpoint compat
+        self.event_max_tokens = int(max(event_max_tokens, 1))
+
+        self.t_emb  = TimeEmbedding(d_model, use_circadian=use_circadian)
+        self.event_value_proj = nn.Sequential(
+            nn.Linear(1, d_model), nn.SiLU(), nn.Linear(d_model, d_model)
+        )
+        self.event_var_emb = nn.Embedding(d_input + 1, d_model, padding_idx=0)
+        self.event_fuse = nn.Sequential(
+            nn.Linear(d_model * 3, d_model), nn.LayerNorm(d_model)
+        )
+        self.layers = nn.ModuleList([
+            MambaBlock(d_model, d_state, d_conv, expand, dropout)
+            for _ in range(n_layers)
+        ])
+        self.norm = nn.LayerNorm(d_model)
+        self.pool = MultiResolutionPooling(d_model)
+
+    def forward(self, x: torch.Tensor, tau: torch.Tensor,
+                mask: Optional[torch.Tensor] = None,
+                t_abs: Optional[torch.Tensor] = None) -> torch.Tensor:
+        h, seq_mask = self._encode(x, tau, mask, t_abs)
+        return self.pool(h, mask=seq_mask)
+
+    def extract_features(self, x: torch.Tensor, tau: torch.Tensor,
+                         mask: Optional[torch.Tensor] = None,
+                         t_abs: Optional[torch.Tensor] = None,
+                         ) -> Tuple[torch.Tensor, torch.Tensor]:
+        h, seq_mask = self._encode(x, tau, mask, t_abs)
+        z_multi   = self.pool.extract(h, mask=seq_mask)
+        raw_stats = self._raw_stats(x, mask)
+        return z_multi, raw_stats
+
+    def _encode(self, x: torch.Tensor, tau: torch.Tensor,
+                mask: Optional[torch.Tensor],
+                t_abs: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+        if mask is None:
+            mask_3d = torch.ones_like(x)
+        elif mask.dim() == 2:
+            mask_3d = mask.unsqueeze(-1).expand_as(x)
+        else:
+            mask_3d = mask
+        return self._encode_event_tokens(x, tau, mask_3d, t_abs)
+
+    def _event_tokenize(
+        self,
+        x: torch.Tensor,
+        tau: torch.Tensor,
+        mask_3d: torch.Tensor,
+        t_abs: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """
+        Convert the irregular multivariate window into APRICOT-style event tokens:
+        one token per observed (timestamp, variable) pair, with explicit value,
+        variable id, and inter-event gap.
+        """
+        B, _, _ = x.shape
+        K = self.event_max_tokens
+        device = x.device
+
+        tok_val = x.new_zeros((B, K, 1))
+        tok_tau = tau.new_full((B, K), 1.0)
+        tok_abs = tau.new_zeros((B, K))
+        tok_var = torch.zeros((B, K), dtype=torch.long, device=device)
+        tok_mask = x.new_zeros((B, K))
+
+        row_abs = tau.cumsum(dim=1) if t_abs is None else t_abs
+
+        for b in range(B):
+            rows, cols = torch.nonzero(mask_3d[b] > 0, as_tuple=True)
+            if rows.numel() == 0:
+                continue
+
+            if rows.numel() > K:
+                rows = rows[-K:]
+                cols = cols[-K:]
+
+            tok_vals_b = x[b, rows, cols]
+            tok_vars_b = cols.to(torch.long) + 1
+            tok_abs_b = row_abs[b, rows]
+            tok_tau_b = tau[b, rows].clone()
+            if tok_tau_b.numel() > 1:
+                same_row = rows[1:] == rows[:-1]
+                tok_tau_b[1:] = torch.where(
+                    same_row,
+                    torch.ones_like(tok_tau_b[1:]),
+                    tok_tau_b[1:],
+                )
+            tok_tau_b = tok_tau_b.clamp(min=1.0, max=86400.0)
+
+            n_tok = int(tok_vals_b.numel())
+            offset = K - n_tok
+            tok_val[b, offset:, 0] = tok_vals_b.float()
+            tok_tau[b, offset:] = tok_tau_b.float()
+            tok_abs[b, offset:] = tok_abs_b.float()
+            tok_var[b, offset:] = tok_vars_b
+            tok_mask[b, offset:] = 1.0
+
+        return tok_val, tok_tau, tok_var, tok_mask, tok_abs
+
+    def _encode_event_tokens(
+        self,
+        x: torch.Tensor,
+        tau: torch.Tensor,
+        mask_3d: torch.Tensor,
+        t_abs: Optional[torch.Tensor] = None,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        tok_val, tok_tau, tok_var, tok_mask, tok_abs = self._event_tokenize(
+            x, tau, mask_3d, t_abs
+        )
+        val_emb = self.event_value_proj(tok_val)
+        var_emb = self.event_var_emb(tok_var)
+        time_emb = self.t_emb(tok_tau, tok_abs)
+        h = self.event_fuse(torch.cat([val_emb, var_emb, time_emb], dim=-1))
+
+        valid = tok_mask.unsqueeze(-1)
+        h = h * valid
+        for layer in self.layers:
+            h = layer(h, tok_tau)
+            h = h * valid
+
+        h = self.norm(h) * valid
+        h = torch.nan_to_num(h, nan=0.0, posinf=1.0, neginf=-1.0)
+        return h, tok_mask
+
+
+    def _raw_stats(self, x: torch.Tensor,
+                   mask: Optional[torch.Tensor]) -> torch.Tensor:
+        B, L, F = x.shape
+        if mask is None:
+            m3 = torch.ones_like(x)
+        elif mask.dim() == 2:
+            m3 = mask.unsqueeze(-1).expand_as(x)
+        else:
+            m3 = mask
+
+        n_obs_raw = m3.sum(dim=1)
+        never_obs = (n_obs_raw == 0)
+        n_obs     = n_obs_raw.clamp(min=1.0)
+
+        last_idx = torch.zeros(B, F, dtype=torch.long, device=x.device)
+        for t in range(L):
+            obs_t    = (m3[:, t, :] > 0)
+            last_idx = torch.where(obs_t, torch.full_like(last_idx, t), last_idx)
+        last_val = x[torch.arange(B).unsqueeze(-1), last_idx,
+                     torch.arange(F).unsqueeze(0)]
+
+        x_obs    = x * m3
+        mean_val = x_obs.sum(dim=1) / n_obs
+        x_max    = x.masked_fill(m3 == 0, float("-inf"))
+        max_val  = torch.nan_to_num(x_max.max(dim=1).values, nan=0.0, neginf=0.0)
+        x_min    = x.masked_fill(m3 == 0, float("inf"))
+        min_val  = torch.nan_to_num(x_min.min(dim=1).values, nan=0.0, posinf=0.0)
+        sq_mean  = (x_obs ** 2).sum(dim=1) / n_obs
+        std_val  = (sq_mean - mean_val ** 2).clamp(min=0.0).sqrt()
+
+        nan_val  = float("nan")
+        last_val = last_val.masked_fill(never_obs, nan_val)
+        mean_val = mean_val.masked_fill(never_obs, nan_val)
+        max_val  = max_val.masked_fill(never_obs,  nan_val)
+        min_val  = min_val.masked_fill(never_obs,  nan_val)
+        std_val  = std_val.masked_fill(never_obs,  nan_val)
+
+        return torch.cat([last_val, mean_val, max_val, min_val, std_val], dim=-1)
+
+
+class DualHeadMamba(nn.Module):
+    def __init__(self, d_input: int, d_model: int = 128,
+                 d_static: int = 0, enable_remaining_head: bool = False, **enc_kw):
+        super().__init__()
+        self.encoder    = MambaEncoder(d_input, d_model, **enc_kw)
+        drop            = enc_kw.get("dropout", 0.1)
+        self.has_static = d_static > 0
+        self.d_static   = int(d_static)
+        self.enable_remaining_head = bool(enable_remaining_head)
+        self.seq_feat_dim = 4 * d_model + 5 * d_input
+        self.head_in_dim = self.seq_feat_dim + self.d_static
+        self.feature_backbone = nn.Sequential(
+            nn.LayerNorm(self.head_in_dim),
+            nn.Linear(self.head_in_dim, d_model * 2),
+            nn.GELU(),
+            nn.Dropout(drop),
+            nn.Linear(d_model * 2, d_model),
+            nn.GELU(),
+            nn.Dropout(drop),
+        )
+        self.mort_head = nn.Sequential(
+            nn.Linear(d_model, d_model // 2), nn.GELU(),
+            nn.Dropout(drop), nn.Linear(d_model // 2, 2),
+        )
+        self.los_head = nn.Sequential(
+            nn.Linear(d_model, d_model // 2), nn.GELU(),
+            nn.Dropout(drop), nn.Linear(d_model // 2, 1),
+        )
+        if self.enable_remaining_head:
+            self.rem_los_head = nn.Sequential(
+                nn.Linear(d_model, d_model // 2), nn.GELU(),
+                nn.Dropout(drop), nn.Linear(d_model // 2, 1),
+            )
+
+    def _assemble_stage2_like_features(
+        self,
+        x: torch.Tensor,
+        tau: torch.Tensor,
+        mask: Optional[torch.Tensor] = None,
+        x_static: Optional[torch.Tensor] = None,
+        t_abs: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        z_multi, raw_stats = self.encoder.extract_features(x, tau, mask, t_abs)
+        parts = [
+            z_multi,
+            torch.nan_to_num(raw_stats, nan=0.0, posinf=0.0, neginf=0.0),
+        ]
+        if self.has_static:
+            if x_static is None:
+                x_static = z_multi.new_zeros((z_multi.shape[0], self.d_static))
+            else:
+                x_static = torch.nan_to_num(x_static, nan=0.0, posinf=0.0, neginf=0.0)
+            parts.append(x_static)
+        return torch.cat(parts, dim=-1)
+
+    def forward(self, x: torch.Tensor, tau: torch.Tensor,
+                mask: Optional[torch.Tensor] = None,
+                x_static: Optional[torch.Tensor] = None,
+                t_abs: Optional[torch.Tensor] = None,
+                ) -> Tuple[torch.Tensor, torch.Tensor]:
+        z = self.feature_backbone(
+            self._assemble_stage2_like_features(x, tau, mask, x_static, t_abs)
+        )
+        return self.mort_head(z), self.los_head(z).squeeze(-1)
+
+    def forward_research(self, x: torch.Tensor, tau: torch.Tensor,
+                         mask: Optional[torch.Tensor] = None,
+                         x_static: Optional[torch.Tensor] = None,
+                         t_abs: Optional[torch.Tensor] = None,
+                         ) -> Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]:
+        z = self.feature_backbone(
+            self._assemble_stage2_like_features(x, tau, mask, x_static, t_abs)
+        )
+        mort = self.mort_head(z)
+        los_total = self.los_head(z).squeeze(-1)
+        los_rem = self.rem_los_head(z).squeeze(-1) if self.enable_remaining_head else None
+        return mort, los_total, los_rem

@@ -1,0 +1,30 @@
+{
+  "bootstrap_replicates": 10000,
+  "permutation_replicates": 10000,
+  "seeds": [
+    42,
+    137,
+    2025,
+    2718,
+    31415
+  ],
+  "metrics": [
+    "auroc",
+    "auprc",
+    "brier",
+    "los_mae",
+    "los_rmse"
+  ],
+  "scopes": [
+    "full_6h",
+    "pooled_stress"
+  ],
+  "cluster_resampling_unit": "patient",
+  "shard_size": 128,
+  "kernel_batch_size": 1024,
+  "max_draw_buffer_bytes": 805306368,
+  "max_threads": 16,
+  "phase_e_input_loading_budget_seconds": 7200,
+  "description": "Runtime recipe; build and run identity are generated locally.",
+  "permutation_batch_size": 128
+}

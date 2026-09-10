@@ -1,0 +1,276 @@
+{
+  "schema_version": "2.0.0",
+  "analysis_id": "maboost_6h_public_reproduction",
+  "created_at": "2026-08-27T03:33:44+07:00",
+  "status": "public_reproduction_recipe",
+  "prespecification_statement": "Reproduction recipe derived from the corrected fixed-6-hour benchmark; fresh runs do not inherit original author approvals or completed results.",
+  "datasets": {
+    "mimic_iv": {
+      "release": "3.1",
+      "role": "development_source_and_reverse_target",
+      "raw_root": "data/raw/mimiciv"
+    },
+    "eicu": {
+      "release": "2.0",
+      "role": "development_source_and_forward_target",
+      "raw_root": "data/raw/eicu"
+    },
+    "mimic_iii_carevue": {
+      "release": "1.4",
+      "role": "nonoverlap_historical_external_target_only",
+      "raw_root": "data/raw/mimic3-carevue/1.4",
+      "required_resource": "https://physionet.org/content/mimic3-carevue/1.4/"
+    },
+    "mimic_iii_full": {
+      "role": "excluded_from_corrected_analysis",
+      "reason": "The full MIMIC-III release overlaps MIMIC-IV and cannot support an independent external-validation claim."
+    }
+  },
+  "cohort": {
+    "minimum_age_years": 65,
+    "landmark_hours": 6.0,
+    "risk_set": "alive_and_in_icu_at_landmark",
+    "predictor_window": "closed_interval_0_to_6_hours_after_icu_admission",
+    "mortality_outcome": "death_during_same_icu_stay_strictly_after_6h_landmark",
+    "remaining_los_outcome_days": "icu_discharge_time_minus_(icu_admission_time_plus_6h)",
+    "one_primary_evaluation_row_per_stay": true,
+    "group_split_fields": {
+      "mimic_iv": "subject_id",
+      "eicu": "uniquepid",
+      "mimic_iii_carevue": "subject_id"
+    }
+  },
+  "feature_contract": {
+    "dynamic_feature_count": 40,
+    "temporal_summary_statistics_per_feature": [
+      "last",
+      "mean",
+      "maximum",
+      "minimum",
+      "standard_deviation"
+    ],
+    "temporal_summary_count": 200,
+    "observedness_rate_count": 40,
+    "static_features": [
+      "age",
+      "gender_male",
+      "emergency_admit",
+      "elective_admit",
+      "insurance_medicare",
+      "insurance_medicaid",
+      "insurance_private",
+      "micu",
+      "sicu",
+      "cicu",
+      "nicu",
+      "csru"
+    ],
+    "static_feature_count": 12,
+    "excluded_static_features": "all_30_elixhauser_flags_derived_from_untimestamped_or_full_hospitalization_diagnoses",
+    "dimensions": {
+      "mamba_z_only": 512,
+      "xgboost_flat": 200,
+      "xgboost_summary_static": 212,
+      "hybrid_plain": 724,
+      "flat_head": 252
+    }
+  },
+  "mamba": {
+    "event_max_tokens": 96,
+    "d_model": 128,
+    "d_state": 32,
+    "d_conv": 4,
+    "expand": 2,
+    "n_layers": 4,
+    "dropout": 0.1,
+    "event_embeddings": [
+      "value_128d",
+      "variable_128d",
+      "time_gap_circadian_128d"
+    ],
+    "token_fusion": "concatenate_384d_then_linear_and_layernorm_to_128d",
+    "pooling": [
+      "last",
+      "mean",
+      "max",
+      "attention"
+    ],
+    "pooled_temporal_dimension": 512,
+    "hyperparameter_search": false,
+    "recipe_policy": "retain_v13_recipe_except_for_the_locked_landmark_and_time_safe_static_contract"
+  },
+  "seeds": [
+    42,
+    137,
+    2025,
+    2718,
+    31415
+  ],
+  "model_registry": [
+    "MABOOST",
+    "Hybrid-plain",
+    "Mamba-z-only",
+    "Flat-head",
+    "XGBOOST-FLAT",
+    "XGBOOST-SUMMARY+STATIC",
+    "GRU-D",
+    "LSTM",
+    "Transformer",
+    "TCN",
+    "SAnD",
+    "STraTS",
+    "InterpNet",
+    "DuETT"
+  ],
+  "transfer_directions": [
+    {
+      "source": "mimic_iv",
+      "targets": [
+        "eicu",
+        "mimic_iii_carevue"
+      ]
+    },
+    {
+      "source": "eicu",
+      "targets": [
+        "mimic_iv",
+        "mimic_iii_carevue"
+      ]
+    }
+  ],
+  "target_label_firewall": {
+    "physical_feature_label_separation": true,
+    "predictions_hashed_before_label_open": true,
+    "source_only_roles": [
+      "normalization",
+      "imputation",
+      "feature_selection",
+      "training",
+      "fusion_selection",
+      "calibration",
+      "threshold_selection"
+    ],
+    "target_labels_first_allowed_stage": "locked_evaluation_metrics"
+  },
+  "matched_augmentation": {
+    "architectures": [
+      "XGBOOST-FLAT",
+      "XGBOOST-SUMMARY+STATIC",
+      "Hybrid-plain",
+      "MABOOST"
+    ],
+    "regimes": [
+      "full_only",
+      "stress_augmented"
+    ],
+    "same_splits_views_weights_and_source_validation_objective": true
+  },
+  "stress_scenarios": [
+    "full_6h",
+    "early_0_5h",
+    "early_1h",
+    "early_2h",
+    "early_3h",
+    "early_4h",
+    "early_5h",
+    "random_prefix",
+    "random_window_1h",
+    "random_window_2h",
+    "random_window_4h",
+    "event_budget_1",
+    "event_budget_2",
+    "event_budget_4",
+    "event_budget_8",
+    "event_budget_16",
+    "event_budget_32",
+    "event_budget_64",
+    "sparse",
+    "dense",
+    "low_gap_variance",
+    "high_gap_variance",
+    "important_lab_loss",
+    "lab_panel_dropout",
+    "feature_dropout_30pct",
+    "event_dropout_50pct",
+    "delayed_update_2h",
+    "late_only_5_to_6h"
+  ],
+  "metrics": {
+    "mortality": [
+      "auroc",
+      "auprc",
+      "brier",
+      "ece",
+      "calibration_intercept",
+      "calibration_slope"
+    ],
+    "remaining_los": [
+      "mae_days",
+      "rmse_days"
+    ],
+    "primary_selection_metric": "source_validation_auprc",
+    "bootstrap_replicates": 10000,
+    "permutation_replicates": 10000,
+    "cluster_unit": "patient",
+    "seed_policy": "report_each_seed_and_mean_sd_without_treating_seeds_as_independent_samples"
+  },
+  "primary_contrasts": [
+    "MABOOST_vs_XGBOOST-SUMMARY+STATIC",
+    "MABOOST_vs_XGBOOST-FLAT",
+    "stress_augmented_vs_full_only_within_architecture",
+    "augmented_MABOOST_vs_augmented_XGBOOST-SUMMARY+STATIC"
+  ],
+  "evidence_families": [
+    "mimic_iv_source_primary",
+    "eicu_source_primary",
+    "fixed_risk_set_temporal_stress",
+    "matched_augmentation",
+    "component_ablation"
+  ],
+  "execution_gates": {
+    "execution_owner": "reproducing_user",
+    "run_identity": "fresh_local_code_and_configuration_bound",
+    "required_stages": [
+      "init",
+      "build-kernel",
+      "preflight",
+      "etl",
+      "train",
+      "analyze",
+      "explain",
+      "report"
+    ]
+  },
+  "resource_guardian": {
+    "ram_cleanup_fraction": 0.85,
+    "ram_critical_stop_fraction": 0.95,
+    "vram_process_fraction": 0.95,
+    "process_isolation_per_model_seed": true,
+    "resume_requires_artifact_hash_match": true
+  },
+  "privacy": {
+    "publicly_forbidden": [
+      "raw_data",
+      "processed_etl",
+      "direct_or_encoded_identifiers",
+      "patient_level_predictions",
+      "row_level_shap",
+      "credential_paths"
+    ],
+    "publicly_allowed": [
+      "code",
+      "executable_configuration",
+      "README",
+      "code_hash_manifest"
+    ]
+  },
+  "rounding": {
+    "performance_metrics_decimals": 4,
+    "counts_decimals": 0,
+    "percentages_decimals": 1
+  },
+  "workspace": {
+    "private_workspace": "benchmark",
+    "private_results": "results/benchmark"
+  }
+}
