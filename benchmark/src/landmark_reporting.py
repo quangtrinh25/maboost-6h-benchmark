@@ -40,13 +40,13 @@ STRESS_GROUPS = {
 }
 
 STRESS_DESCRIPTIONS = {
-    "full_6h": "All observations timestamped from ICU admission through 6 h.",
-    "early_0_5h": "Only observations available through 0.5 h.",
-    "early_1h": "Only observations available through 1 h.",
-    "early_2h": "Only observations available through 2 h.",
-    "early_3h": "Only observations available through 3 h.",
-    "early_4h": "Only observations available through 4 h.",
-    "early_5h": "Only observations available through 5 h.",
+    "full_6h": "Recorded-time-corrected 6 h input; unverified-source timing retained.",
+    "early_0_5h": "Input timeline prefix through 0.5 h; unverified-source timing retained.",
+    "early_1h": "Input timeline prefix through 1 h; unverified-source timing retained.",
+    "early_2h": "Input timeline prefix through 2 h; unverified-source timing retained.",
+    "early_3h": "Input timeline prefix through 3 h; unverified-source timing retained.",
+    "early_4h": "Input timeline prefix through 4 h; unverified-source timing retained.",
+    "early_5h": "Input timeline prefix through 5 h; unverified-source timing retained.",
     "random_prefix": "Deterministic, stay-specific prefix ending at an observed time.",
     "random_window_1h": "Deterministic, stay-specific continuous 1 h window.",
     "random_window_2h": "Deterministic, stay-specific continuous 2 h window.",

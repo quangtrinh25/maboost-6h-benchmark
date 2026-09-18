@@ -22,13 +22,10 @@ from landmark_protocol import (
 )
 from v13_etl import (
     LANDMARK_HOURS,
-    _EventAccumulator,
-    _scan_mimic_events,
     build_eicu_cohort,
     build_mimic_cohort,
     build_static_feature_matrix,
 )
-from v13_external_etl import scan_eicu_events_vectorized
 from v13_feature_registry import DYNAMIC_FEATURES, STATIC_FEATURES
 from v13_guard import assert_safe_output_path, safe_write_json, safe_write_text, sha256_file
 
@@ -53,43 +50,19 @@ def _icu_type_codes(values: list[str]) -> tuple[np.ndarray, dict[str, int]]:
     ], dtype=np.int16), registry
 
 
-def _build_dataset(dataset: str, config: dict[str, Any]) -> tuple[Any, dict[str, np.ndarray], dict[str, Any]]:
+def _build_dataset(dataset: str, config: dict[str, Any], *, audit_preview_rows: int = 0) -> tuple[Any, dict[str, np.ndarray], dict[str, Any]]:
     dataset_config = config["datasets"][dataset]
     raw_root = REPO_ROOT / dataset_config["raw_root"]
+    from correction09_availability import scan_corrected
     if dataset == "eicu":
         cohort = build_eicu_cohort(raw_root, minimum_age=int(config["minimum_age_years"]))
-        accumulator = _EventAccumulator(
-            cohort.frame["stay_key"].tolist(),
-            sequence_length=int(config["sequence_length"]),
-            retain_only_last=True,
-        )
-        event_scan, accumulator = scan_eicu_events_vectorized(
-            cohort.frame,
-            raw_root,
-            max_rows=0,
-            sequence_length=int(config["sequence_length"]),
-            accumulator=accumulator,
-        )
     else:
-        cohort = build_mimic_cohort(
-            raw_root,
-            dataset=dataset,
-            minimum_age=int(config["minimum_age_years"]),
-            exclude_uncertain_positive=True,
-        )
-        accumulator = _EventAccumulator(
-            cohort.frame["stay_key"].tolist(),
-            sequence_length=int(config["sequence_length"]),
-            retain_only_last=True,
-        )
-        event_scan, _ = _scan_mimic_events(
-            cohort.frame,
-            raw_root,
-            dataset=dataset,
-            max_rows=0,
-            sequence_length=int(config["sequence_length"]),
-            accumulator=accumulator,
-        )
+        cohort = build_mimic_cohort(raw_root, dataset=dataset,
+                                   minimum_age=int(config["minimum_age_years"]),
+                                   exclude_uncertain_positive=True)
+    if audit_preview_rows < 0:
+        raise ValueError("Preview rows cannot be negative")
+    event_scan, accumulator = scan_corrected(cohort.frame, raw_root, dataset, config, max_rows=audit_preview_rows)
     dynamic, dynamic_audit = accumulator.materialize_arrays()
     static, static_audit = build_static_feature_matrix(
         cohort.frame,
@@ -97,6 +70,7 @@ def _build_dataset(dataset: str, config: dict[str, Any]) -> tuple[Any, dict[str,
         dataset=dataset,
         max_rows=0,
     )
+    static_audit["availability_class"] = "per_field_availability_unverified"
     n = len(cohort.frame)
     if dynamic["values"].shape != (n, int(config["sequence_length"]), 40):
         raise RuntimeError(f"{dataset} dynamic shape drift")
@@ -121,6 +95,7 @@ def _build_dataset(dataset: str, config: dict[str, Any]) -> tuple[Any, dict[str,
         "icu_type_code": icu_codes,
     }
     audit = {
+        "availability_correction": event_scan,
         "cohort": cohort.metadata,
         "flow": cohort.flow,
         "event_scan": event_scan,
@@ -136,6 +111,10 @@ def _build_dataset(dataset: str, config: dict[str, Any]) -> tuple[Any, dict[str,
 
 
 def _write_dataset(dataset: str, arrays: dict[str, np.ndarray], audit: dict[str, Any], config_hash: str, plan_hash: str, config: dict[str, Any]) -> dict[str, Any]:
+    if (config.get("availability_correction_sha256") and (audit or arrays)
+            and not (REPO_ROOT / "SYNTHETIC_SMOKE_ONLY").is_file()
+            and audit.get("availability_correction", {}).get("complete_raw_table_scan") is not True):
+        raise RuntimeError("Only a complete correction09 ETL may write a production dataset")
     destination = assert_safe_output_path(
         REPO_ROOT / config["datasets"][dataset]["private_root"]
     )
@@ -200,6 +179,10 @@ def _write_dataset(dataset: str, arrays: dict[str, np.ndarray], audit: dict[str,
             "feature_artifacts": artifact_records(feature_paths, relative_to=feature_root),
             "sealed_label_artifacts": artifact_records(label_paths, relative_to=label_root),
             "aggregate_audit_sha256": sha256_file(staging / "aggregate_audit.json"),
+            "dynamic_raw_table_sha256": {
+                name: table["raw_sha256"]
+                for name, table in audit.get("availability_correction", {}).get("tables", {}).items()
+            },
         }
         safe_write_json(staging / "manifest_private.json", manifest)
         safe_write_text(

@@ -97,6 +97,9 @@ def load_protocol() -> tuple[dict[str, Any], str, dict[str, Any], str]:
         raise RuntimeError("landmark config is not bound to the active amendment")
     if config.get("gates", {}).get("manuscript_modification") is not False:
         raise PermissionError("computational config must keep manuscript gate closed")
+    from correction09_availability import load_correction_record
+    if plan.get("availability_correction") != load_correction_record(config):
+        raise RuntimeError("availability correction is not bound to the active amendment")
     return plan, plan_observed, config, config_observed
 
 
@@ -253,12 +256,26 @@ def artifact_records(paths: Iterable[Path], *, relative_to: Path) -> list[dict[s
 
 
 def write_phase_report(phase: str, payload: dict[str, Any]) -> tuple[Path, str]:
+    plan, _, config, _ = load_protocol()
+    availability_note = (
+        "Correction09 uses recorded-time eligibility where timestamps exist. "
+        "CareVue labs, eICU vital tables and static availability remain unverified; "
+        "eICU lab revision time is not first-result availability. "
+        "Earlier prefixes are stress views at the fixed 6h outcome landmark. "
+        "Universal prospective availability is not claimed."
+    )
     report = {
         "schema_version": "1.0.0",
         "phase": phase,
         "created_at_utc": now_utc(),
         "manuscript_modified": False,
         **payload,
+        "analysis_id": plan["analysis_id"],
+        "availability_correction_sha256": config["availability_correction_sha256"],
+        "availability_execution_mode": plan["availability_correction"]["execution_mode"],
+        "historical_parent_comparison_performed": False,
+        "availability_disclosure": availability_note,
+        "universal_prospective_availability_claim": False,
     }
     path = PHASE_REPORT_ROOT / f"PHASE_REPORT_{phase}.json"
     safe_write_json(path, report)
@@ -275,6 +292,7 @@ def write_phase_report(phase: str, payload: dict[str, Any]) -> tuple[Path, str]:
         f"- Config SHA-256: `{report.get('config_sha256', 'n/a')}`",
         f"- Command: `{report.get('command', 'n/a')}`",
         f"- Manuscript modified: `{report.get('manuscript_modified', False)}`",
+        f"- Availability scope: {availability_note}",
         "",
         "## Tests",
         "",

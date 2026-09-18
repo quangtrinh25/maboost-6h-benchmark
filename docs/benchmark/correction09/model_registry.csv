@@ -1,0 +1,15 @@
+name,family,trainer,temporal_summaries,static_covariates,observedness_rates,source_validation_selection,mortality_task,los_task
+MABOOST,primary,mamba_validation_selected_fusion,200.0,12,40.0,True,True,True
+Hybrid-plain,primary,mamba_z_plus_raw_summary_static,200.0,12,0.0,True,True,True
+Mamba-z-only,primary,mamba_z_only,,0,0.0,True,True,True
+Flat-head,primary,xgboost_flat_head,200.0,12,40.0,True,True,True
+XGBOOST-FLAT,primary,xgboost_strict_flat,200.0,0,0.0,True,True,True
+XGBOOST-SUMMARY+STATIC,primary,xgboost_summary_static,200.0,12,0.0,True,True,True
+GRU-D,deep_baseline,torch_grud,,12,,True,True,True
+LSTM,deep_baseline,torch_lstm,,12,,True,True,True
+Transformer,deep_baseline,torch_transformer,,12,,True,True,True
+TCN,deep_baseline,torch_tcn,,12,,True,True,True
+SAnD,deep_baseline,torch_sand,,12,,True,True,True
+STraTS,deep_baseline,torch_strats,,12,,True,True,True
+InterpNet,deep_baseline,torch_interpnet,,12,,True,True,True
+DuETT,deep_baseline,torch_duett,,12,,True,True,True

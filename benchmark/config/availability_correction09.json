@@ -1,0 +1,20 @@
+{
+  "correction_id": "09_recorded_availability",
+  "classification": "post-audit methodological correction, not prespecified from project start",
+  "known_timestamp_eligibility": "0 <= event_offset <= independent_offset <= 360; all values finite",
+  "known_timestamp_bins": "ceil(independent_offset) minutes",
+  "missing_or_invalid_timestamp": "exclude when independent column exists",
+  "before_event_timestamp": "exclude and report",
+  "without_independent_timestamp": "retain event-time values; availability unverified",
+  "eicu_lab": "conservative revised-value cutoff; first availability unproven",
+  "static": "unchanged; per-field availability unverified",
+  "claim": "Recorded-availability-corrected benchmark with explicitly unverified sources; not universal prospective availability",
+  "full_retraining_jobs": 180,
+  "execution_owner": "reproducing_user",
+  "legacy_job_reuse": false,
+  "historical_results_overwrite": false,
+  "execution_mode": "fresh_public_raw_data",
+  "historical_parent_artifacts_required": false,
+  "historical_parent_comparison_performed": false,
+  "cohort_and_splits": "rebuilt from governed raw data using the unchanged deterministic algorithms"
+}

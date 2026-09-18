@@ -1,6 +1,6 @@
 {
   "schema_version": "2.0.0",
-  "analysis_plan_sha256": "d5e7f3303e7284d855e2ddea008e905a9c7af7525a59e30b68ec0ea2dc4fadd2",
+  "analysis_plan_sha256": "ab7513f693015d9c0bd881c3d7ab1895c7fb5e86d807e3e21ffc2a06c915e8b9",
   "landmark_hours": 6.0,
   "sequence_length": 96,
   "minimum_age_years": 65,
@@ -214,5 +214,6 @@
     "full_launch_requires_approval": false,
     "manuscript_modification": false,
     "execution_owner": "reproducing_user"
-  }
+  },
+  "availability_correction_sha256": "d8e2f0f72bf806bf996db110f28ede527dcc149f6379706d086da5db90b271e7"
 }

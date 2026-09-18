@@ -1,9 +1,9 @@
 {
   "schema_version": "2.0.0",
-  "analysis_id": "maboost_6h_public_reproduction",
-  "created_at": "2026-08-27T03:33:44+07:00",
+  "analysis_id": "maboost_6h_correction09_public_reproduction",
+  "created_at": "2026-09-18",
   "status": "public_reproduction_recipe",
-  "prespecification_statement": "Reproduction recipe derived from the corrected fixed-6-hour benchmark; fresh runs do not inherit original author approvals or completed results.",
+  "prespecification_statement": "Public reproduction of the post-audit correction09 recorded-availability policy. This portable recipe has its own code/configuration identity; it does not inherit author approvals, private audit comparisons, or completed results.",
   "datasets": {
     "mimic_iv": {
       "release": "3.1",
@@ -30,7 +30,7 @@
     "minimum_age_years": 65,
     "landmark_hours": 6.0,
     "risk_set": "alive_and_in_icu_at_landmark",
-    "predictor_window": "closed_interval_0_to_6_hours_after_icu_admission",
+    "predictor_window": "closed 0-6h event window and independent-time cutoff where available; retained unverified event-time sources disclosed",
     "mortality_outcome": "death_during_same_icu_stay_strictly_after_6h_landmark",
     "remaining_los_outcome_days": "icu_discharge_time_minus_(icu_admission_time_plus_6h)",
     "one_primary_evaluation_row_per_stay": true,
@@ -272,5 +272,25 @@
   "workspace": {
     "private_workspace": "benchmark",
     "private_results": "results/benchmark"
+  },
+  "availability_correction": {
+    "correction_id": "09_recorded_availability",
+    "classification": "post-audit methodological correction, not prespecified from project start",
+    "known_timestamp_eligibility": "0 <= event_offset <= independent_offset <= 360; all values finite",
+    "known_timestamp_bins": "ceil(independent_offset) minutes",
+    "missing_or_invalid_timestamp": "exclude when independent column exists",
+    "before_event_timestamp": "exclude and report",
+    "without_independent_timestamp": "retain event-time values; availability unverified",
+    "eicu_lab": "conservative revised-value cutoff; first availability unproven",
+    "static": "unchanged; per-field availability unverified",
+    "claim": "Recorded-availability-corrected benchmark with explicitly unverified sources; not universal prospective availability",
+    "full_retraining_jobs": 180,
+    "execution_owner": "reproducing_user",
+    "legacy_job_reuse": false,
+    "historical_results_overwrite": false,
+    "execution_mode": "fresh_public_raw_data",
+    "historical_parent_artifacts_required": false,
+    "historical_parent_comparison_performed": false,
+    "cohort_and_splits": "rebuilt from governed raw data using the unchanged deterministic algorithms"
   }
 }

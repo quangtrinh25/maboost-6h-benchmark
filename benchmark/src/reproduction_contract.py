@@ -43,12 +43,16 @@ def write_locked(path, payload):
 
 def initialize_run():
     code = verify_code()
-    _, ph, _, ch = load_protocol()
+    plan, ph, config, ch = load_protocol()
     if REGISTRATION.exists():
         return require_run()
     payload = {'schema_version': '1.0.0', 'mode': 'fresh_public_reproduction',
                'created_at_utc': now_utc(), 'analysis_plan_sha256': ph,
                'config_sha256': ch, **code, 'python': platform.python_version(),
+               'analysis_id': plan['analysis_id'],
+               'availability_execution_mode': plan['availability_correction']['execution_mode'],
+               'availability_correction_sha256': config['availability_correction_sha256'],
+               'historical_parent_comparison_performed': False,
                'historical_author_approval_inherited': False,
                'historical_results_imported': False}
     write_locked(REGISTRATION, payload)
@@ -58,9 +62,13 @@ def initialize_run():
 def require_run():
     code = verify_code()
     payload = locked_json(REGISTRATION)
-    _, ph, _, ch = load_protocol()
+    plan, ph, config, ch = load_protocol()
     for key, value in {'mode': 'fresh_public_reproduction', 'analysis_plan_sha256': ph,
-                       'config_sha256': ch, 'code_manifest_sha256': code['code_manifest_sha256']}.items():
+                       'config_sha256': ch, 'code_manifest_sha256': code['code_manifest_sha256'],
+                       'analysis_id': plan['analysis_id'],
+                       'availability_execution_mode': plan['availability_correction']['execution_mode'],
+                       'availability_correction_sha256': config['availability_correction_sha256'],
+                       'historical_parent_comparison_performed': False}.items():
         if payload.get(key) != value:
             raise RuntimeError(f'Run registration mismatch: {key}; use a fresh checkout for a new recipe')
     return {**payload, 'record_sha256': sha256_file(REGISTRATION)}
@@ -128,8 +136,12 @@ def load_analysis_runtime():
 
 
 def _verify_outputs(files, directory):
+    # Phase G historically used four logical table names in its inventory.
+    # Resolve only the registered aliases, and only in the reporting directory.
+    from correction07_contract import CORRECTION07_PHASE_G_TABLE_PATHS
     for name, expected in files.items():
-        path = directory / name
+        filename = CORRECTION07_PHASE_G_TABLE_PATHS.get(name, name) if directory.name == 'tables' else name
+        path = directory / filename
         locked = path.with_suffix(path.suffix+'.sha256')
         if not path.is_file() or not locked.is_file() or sha256_file(path) != expected or locked.read_text().split()[0] != expected:
             raise RuntimeError(f'Output artifact drift: {name}')

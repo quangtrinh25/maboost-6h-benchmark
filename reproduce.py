@@ -87,7 +87,7 @@ def main():
                          'explain':('landmark_explainability','run_explainability'),
                          'report':('landmark_reporting','run_reporting')}
             module, name = functions[args.command]
-            if args.command == 'analyze' and (RESULTS_ROOT/'canonical').exists():
+            if args.command == 'analyze' and (RESULTS_ROOT/'phase_reports/PHASE_REPORT_E_ANALYSIS.json').exists():
                 from reproduction_contract import require_analysis_report
                 require_analysis_report()
                 result, code = {'status':'already_complete_verified'}, 0

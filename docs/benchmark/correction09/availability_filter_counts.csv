@@ -1,0 +1,13 @@
+dataset,excluded,kept,table,accepted_before_correction
+mimic_iv,368802,2668527,chartevents,3037329
+mimic_iv,82019,870919,labevents,952938
+mimic_iv,33152,117851,outputevents,151003
+eicu,19617,111197,intakeOutput,130814
+eicu,115589,784189,lab,899778
+eicu,382387,5710548,nurseCharting,6092935
+eicu,27819,362009,respiratoryCharting,389828
+eicu,0,4219655,vitalAperiodic,4219655
+eicu,0,21120433,vitalPeriodic,21120433
+mimic_iii_carevue,186118,613050,chartevents,799168
+mimic_iii_carevue,0,175772,labevents,175772
+mimic_iii_carevue,9593,26923,outputevents,36516

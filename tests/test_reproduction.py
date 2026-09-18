@@ -4,6 +4,7 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch, Mock
 
 import numpy as np
 
@@ -51,6 +52,46 @@ class ReproductionTests(unittest.TestCase):
         from run_landmark_job import run_job
         with self.assertRaises(PermissionError):
             run_job('mimic_iv__xgboost_flat__full_only__seed42', bounded=True)
+
+    def test_reporting_table_aliases_verify_real_files_and_reject_drift(self):
+        from reproduction_contract import _verify_outputs
+        from correction07_contract import CORRECTION07_PHASE_G_TABLE_PATHS
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)/'tables'
+            directory.mkdir()
+            files = {}
+            for alias in ('table_1.csv', 'table_2.csv', 'table_3A.csv', 'table_3B.csv'):
+                path = directory/CORRECTION07_PHASE_G_TABLE_PATHS[alias]
+                path.write_text('synthetic,aggregate\n1,2\n')
+                digest = hashlib.sha256(path.read_bytes()).hexdigest()
+                path.with_suffix('.csv.sha256').write_text(digest+'  '+path.name+'\n')
+                files[alias] = digest
+            _verify_outputs(files, directory)
+            path.write_text('changed\n')
+            with self.assertRaisesRegex(RuntimeError, 'Output artifact drift'):
+                _verify_outputs(files, directory)
+
+    def test_analyze_resumes_partial_canonical_directory(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('public_reproduce', ROOT/'reproduce.py')
+        cli = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cli)
+        import landmark_protocol, reproduction_contract
+        analysis = Mock()
+        analysis.run_analysis.return_value = ({'status': 'pass'}, 0)
+        with tempfile.TemporaryDirectory() as tmp:
+            results = Path(tmp)
+            (results/'canonical').mkdir()
+            with patch.object(sys, 'argv', ['reproduce.py', 'analyze']), patch.object(landmark_protocol, 'RESULTS_ROOT', results), patch.object(reproduction_contract, 'require_run', return_value={}), patch.object(reproduction_contract, 'require_analysis_report') as verify, patch.dict(sys.modules, {'landmark_analysis': analysis}):
+                self.assertEqual(cli.main(), 0)
+                analysis.run_analysis.assert_called_once_with()
+                verify.assert_not_called()
+                analysis.run_analysis.reset_mock()
+                (results/'phase_reports').mkdir()
+                (results/'phase_reports/PHASE_REPORT_E_ANALYSIS.json').write_text('{}')
+                self.assertEqual(cli.main(), 0)
+                verify.assert_called_once_with()
+                analysis.run_analysis.assert_not_called()
 
 
 if __name__ == '__main__':

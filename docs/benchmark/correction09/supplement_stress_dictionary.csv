@@ -1,0 +1,29 @@
+scenario,group,description
+full_6h,Reference,All observations timestamped from ICU admission through 6 h.
+early_0_5h,Early prefix,Input timeline prefix through 0.5 h; unverified-source timing retained.
+early_1h,Early prefix,Input timeline prefix through 1 h; unverified-source timing retained.
+early_2h,Early prefix,Input timeline prefix through 2 h; unverified-source timing retained.
+early_3h,Early prefix,Input timeline prefix through 3 h; unverified-source timing retained.
+early_4h,Early prefix,Input timeline prefix through 4 h; unverified-source timing retained.
+early_5h,Early prefix,Input timeline prefix through 5 h; unverified-source timing retained.
+random_prefix,Window,"Deterministic, stay-specific prefix ending at an observed time."
+random_window_1h,Window,"Deterministic, stay-specific continuous 1 h window."
+random_window_2h,Window,"Deterministic, stay-specific continuous 2 h window."
+random_window_4h,Window,"Deterministic, stay-specific continuous 4 h window."
+event_budget_1,Event budget,Retain only the most recent 1 observed event token(s).
+event_budget_2,Event budget,Retain only the most recent 2 observed event token(s).
+event_budget_4,Event budget,Retain only the most recent 4 observed event token(s).
+event_budget_8,Event budget,Retain only the most recent 8 observed event token(s).
+event_budget_16,Event budget,Retain only the most recent 16 observed event token(s).
+event_budget_32,Event budget,Retain only the most recent 32 observed event token(s).
+event_budget_64,Event budget,Retain only the most recent 64 observed event token(s).
+sparse,Density/timing,Deterministically retain 25% of observed event tokens.
+dense,Density/timing,Deterministically retain 75% of observed event tokens.
+low_gap_variance,Density/timing,Replace observed inter-event gaps by their within-stay mean.
+high_gap_variance,Density/timing,Increase alternating gap variability while preserving total gap mass.
+important_lab_loss,Missingness,Remove the registered high-value laboratory subset.
+lab_panel_dropout,Missingness,Remove one deterministic laboratory panel per stay.
+feature_dropout_30pct,Missingness,Remove 30% of dynamic variables per stay.
+event_dropout_50pct,Missingness,Remove 50% of observed event tokens per stay.
+delayed_update_2h,Recency,Simulate a delayed update by retaining only 0--4 h data.
+late_only_5_to_6h,Recency,Retain observations only from 5--6 h.

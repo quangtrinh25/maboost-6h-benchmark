@@ -32,3 +32,8 @@ venv/
 *.docx
 *.zip
 .pytest_cache/
+
+# Explicitly reviewed aggregate publication assets only.
+!/docs/benchmark/correction09/*.csv
+!/docs/figures/*.png
+!/docs/figures/*.svg

@@ -4,23 +4,27 @@
   "files": [
     {
       "file": "benchmark/analysis_plan_v13_landmark_amendment_02.json",
-      "sha256": "d5e7f3303e7284d855e2ddea008e905a9c7af7525a59e30b68ec0ea2dc4fadd2"
+      "sha256": "ab7513f693015d9c0bd881c3d7ab1895c7fb5e86d807e3e21ffc2a06c915e8b9"
     },
     {
       "file": "benchmark/analysis_plan_v13_landmark_amendment_02.sha256",
-      "sha256": "aae6ce03dacbb905b1e949619222c89246720087930c83974a909bdcf804f12a"
+      "sha256": "b9679e41ea751627852c3d1a2132af34a3ba5a3fd810d1b70057863186b20f8b"
     },
     {
       "file": "benchmark/config/analysis_engine.json",
       "sha256": "0dab267721123534a9c1e77d108629a1a3c2d40dce61f70bca2b56fb9a6d8205"
     },
     {
+      "file": "benchmark/config/availability_correction09.json",
+      "sha256": "d8e2f0f72bf806bf996db110f28ede527dcc149f6379706d086da5db90b271e7"
+    },
+    {
       "file": "benchmark/config/landmark_v13.json",
-      "sha256": "030e7dc48d0b79ba5bb294e67e2aa654dfc6c6eda04a250f47ac0845cf8472e7"
+      "sha256": "90fd038f5747e9bb5545b8839f0e1fc59f2da312ca17ed41451b304dc6a20b51"
     },
     {
       "file": "benchmark/config/landmark_v13.sha256",
-      "sha256": "d37680763b1fa1530bd25f9d7c93350b0bb9f4de3a9404969ab9f2199989059c"
+      "sha256": "e2d46087173342038b1e4a63690b4f2dadcf41aea212cd4bab55739917f9f3a9"
     },
     {
       "file": "benchmark/rust_analysis_kernel/Cargo.lock",
@@ -79,12 +83,20 @@
       "sha256": "423c2bd407b5322a6a9052a902b75efeb3d3f736e248cf7cd3874204a9fa50c8"
     },
     {
+      "file": "benchmark/src/correction09_availability.py",
+      "sha256": "dc3f938e614372d82af2c6c8265b48a52d36aa8933bbeb79ef0da8fb1ac3c275"
+    },
+    {
+      "file": "benchmark/src/correction09_timestamps.py",
+      "sha256": "38d66b429685fe46fd79c7a7d4b82b009a8540d8a6cca0f185c4147832711b67"
+    },
+    {
       "file": "benchmark/src/landmark_analysis.py",
       "sha256": "7ad35c4a9a83adab81faecbb659e0afc88756292b214f37c3c7d06b54e5a3f4f"
     },
     {
       "file": "benchmark/src/landmark_etl.py",
-      "sha256": "51fcc6fafcb38ce0f43a760b8b2f89363037cfe2322bf1d4e37e6e08eaeba89b"
+      "sha256": "f10eab1103c24d2cfddcb1aa1063e963816f730293565ee52a6d987cb895626f"
     },
     {
       "file": "benchmark/src/landmark_explainability.py",
@@ -104,15 +116,15 @@
     },
     {
       "file": "benchmark/src/landmark_protocol.py",
-      "sha256": "614c2a9580299e18dbb2cf7e0c1dcdcd67b534167e27a112c78b1f19aa76f0ae"
+      "sha256": "87e22fb538e7225ded6fc7fc89e1501f045396cf2ff3b9e36208c74b51f413dd"
     },
     {
       "file": "benchmark/src/landmark_reporting.py",
-      "sha256": "28f971e17c7c615f6d9f14b89577c9e75d9777bdb564b3549f08c5eb60da8238"
+      "sha256": "89abf98141ae320633975fc9971f1a26483e55df199dc2bbf5c6a0560c8f2326"
     },
     {
       "file": "benchmark/src/reproduction_contract.py",
-      "sha256": "5a12923ad840959aa5bcd4cb6311f61369b003e5505b62b7322a6f53795f1015"
+      "sha256": "8f255ea18f52bcff1ad5f86ebad4f9683beda17b24d502fdaa20de8ffa3f4fab"
     },
     {
       "file": "benchmark/src/run_landmark_job.py",
@@ -168,7 +180,7 @@
     },
     {
       "file": "reproduce.py",
-      "sha256": "41cb88a0a770439c2acf979130d1d64868b4333cc78cfe678a8719da0f341501"
+      "sha256": "24f0cf5e472ad95bf08874bc923484c470cad49190e012f5b90bcd745aef36b4"
     },
     {
       "file": "requirements.txt",
@@ -203,6 +215,10 @@
       "sha256": "2255d0ebf03c2d84293ecf8482829a5b161217629dba2f60cac0151910ad97c9"
     },
     {
+      "file": "tests/test_availability_correction.py",
+      "sha256": "68f1d2ad2c6c51b83aff7edb8e03801e7b094632f71f978d62620bfaf60a6d03"
+    },
+    {
       "file": "tests/test_ensemble.py",
       "sha256": "2ae9d4c18612feeecd9d079e9bac2bbf700f1b788deecc044d5e03938d88991d"
     },
@@ -212,11 +228,15 @@
     },
     {
       "file": "tests/test_reproduction.py",
-      "sha256": "d9f8761f5113af4a45ca66076932eb777f7a91c11e684d9865da2cdbf9c37250"
+      "sha256": "8aec79baed429e86ded714d69a5ba3379fd2dcb303bc9e32a5220df059b73277"
     },
     {
       "file": "tools/lock_code.py",
       "sha256": "487babe29d702d07ef28f3ba4abe88a7a5c3d50c931c1bbcd09f0ed5d873732d"
+    },
+    {
+      "file": "tools/render_results.py",
+      "sha256": "fa4f8c24c972ce33878a82820bf46c4f6e6f15e4bf1a227aacdeb69a2fd695e5"
     },
     {
       "file": "tools/synthetic_smoke.py",

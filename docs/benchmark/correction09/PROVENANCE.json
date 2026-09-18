@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.0.0",
+  "release": "correction09-recorded-availability",
+  "assessed_at": "2026-09-18",
+  "author_run_completed_at_utc": "2026-09-17T20:31:28.531006+00:00",
+  "author_run_registration_sha256": "d71e37f321427123522d3da312ed04792bd873d38f87a322f4ed51872fef2a9a",
+  "author_code_manifest_sha256": "8b7515833d1b6073025decb57c2d568952ec63e34ea6526aaf3ee8d58eaae149",
+  "author_analysis_plan_sha256": "fb90d3ebec275d48bac71a540c5816005701aa8fa4cf6863aab1eb230d1a873a",
+  "author_config_sha256": "4b9316e1128e5345b075137ccb297977c8ed40e019acf81e62b83680eb96c92e",
+  "completed_jobs": 180,
+  "canonical_per_seed_rows": 15120,
+  "paired_contrasts": 420,
+  "phases": {
+    "PHASE_REPORT_A_PREFLIGHT": {
+      "status": "pass",
+      "sha256": "ea48c857a02fa79e67b012c18cad3f01a9b894bd896844e4031528fe8c8dcc08"
+    },
+    "PHASE_REPORT_B_ETL": {
+      "status": "pass",
+      "sha256": "2b6dfa2ea79c9fc7981337a38312a93d1945e764b8797e444f4c7df22d3291de"
+    },
+    "PHASE_REPORT_D_FULL": {
+      "status": "pass",
+      "sha256": "2a22276c94b2bc99b45aac7cbebe9dee426f2f754fd2f03f748e3d72653a682e"
+    },
+    "PHASE_REPORT_E_ANALYSIS": {
+      "status": "pass",
+      "sha256": "5e6e24ad625f0e93fc472c79dd12e71a033766b756f0aa54750db2875fcc64a9"
+    },
+    "PHASE_REPORT_F_EXPLAINABILITY": {
+      "status": "pass",
+      "sha256": "9e1628b7d1d63a376e776658ab17d84b78fc0b1a1db67a4b673e40d3713d128e"
+    },
+    "PHASE_REPORT_G_REPORTING": {
+      "status": "pass",
+      "sha256": "cdf30e333fb34086a863493b7fde34908eef000d806448c7ccd95bcb26a9b82d"
+    }
+  },
+  "checks": {
+    "completed_job_artifact_hashes": "pass_180_of_180",
+    "analysis_explanation_reporting_chain": "pass",
+    "reporting_table_aliases": "Four logical table IDs resolved via registered CORRECTION07_PHASE_G_TABLE_PATHS; actual bytes and SHA sidecars match. Original generic verifier did not resolve these aliases.",
+    "clinical_retraining_in_public_checkout": false
+  },
+  "successful_job_wall_hours": 109.72008358151731,
+  "runtime_exclusions": [
+    "ETL",
+    "failed/interrupted attempts",
+    "analysis/explanation/reporting"
+  ],
+  "publication_scope": "Aggregate statistics only; no patient rows, identifiers, per-stay predictions, model checkpoints, raw data or manuscript.",
+  "public_code_note": "Portable reproduction has a distinct fresh-run identity and reconstructs the corrected inputs from governed raw data. Author parent-audit, cohort and split comparisons are historical validations, not imported public approvals.",
+  "artifacts": [
+    {
+      "file": "aggregate_metrics.csv",
+      "sha256": "c30d94dcf6ec9d867a21929553e114ba1695c7fb0985ce9aaca5086dabd06080",
+      "rows": 3024,
+      "source": "canonical/aggregate_metrics.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "cohort_characteristics.csv",
+      "sha256": "cb102ba0a44c9a505a1483fbe6511cd9d2bda4a3b8c71d3ac54070596cf15e57",
+      "rows": 3,
+      "source": "canonical/cohort_characteristics.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "cohort_flow.csv",
+      "sha256": "d5c35ec13cddb22748cc8beafee2f3ab0b719c73de6fc1534959acf09ca1eb1c",
+      "rows": 30,
+      "source": "canonical/cohort_flow.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "primary_contrasts.csv",
+      "sha256": "17c7adca4733878c19d6eb2b47b458ce0339714e97aaa3b650bc3180f738deb6",
+      "rows": 420,
+      "source": "canonical/primary_contrasts.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "model_registry.csv",
+      "sha256": "0a8c37649cfbec22804d7261ef766f8b7f1391326eac6386414d121a651b1579",
+      "rows": 14,
+      "source": "canonical/model_registry.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "fusion_pathway_contributions.csv",
+      "sha256": "216f172a4dda0378171cfc9aa311bfee61396dd28b31635409123c55cf12b8c8",
+      "rows": 30,
+      "source": "explainability/fusion_pathway_contributions.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "shap_importance_aggregate.csv",
+      "sha256": "62cb49caa4e9acb0e2959d48e45f4fb591d3c2e8143dfeb7a8c24c98ef996e84",
+      "rows": 252,
+      "source": "explainability/shap_importance_aggregate.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "temporal_feature_occlusion.csv",
+      "sha256": "e4471b4bf300819cfd31badb0493184e1b9a4a471eafd1d19ece6fe6cd8c62fb",
+      "rows": 80,
+      "source": "explainability/temporal_feature_occlusion.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "supplement_stress_dictionary.csv",
+      "sha256": "79f1a0d62bb43d6abd9acdf18b12ac209fdcae391882fc9c237eec5c7d999166",
+      "rows": 28,
+      "source": "tables/supplement_stress_dictionary.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "availability_filter_counts.csv",
+      "sha256": "4c47b5fbef403c4b282cd505c0b458c9dbb9ac8ec633d124b3f842837db0ac4d",
+      "rows": 12,
+      "source": "qualification/CORRECTION09_ETL_QUALIFICATION.json",
+      "source_sha256": "9ede650f093518c3847253baab530ad4095ef6e7f3c771d67ea58d5e97cd1e6d",
+      "transformation": "aggregate table counts only; before = kept + excluded"
+    },
+    {
+      "file": "table_5.csv",
+      "sha256": "f548541981ad7508143dbfea311981c0cdb7f9ebc52f880971cb027060455a4e",
+      "rows": 96,
+      "source": "tables/table_5.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    },
+    {
+      "file": "table_8.csv",
+      "sha256": "6191fbcfab96c589d30d74a01ce24a77ee65c2f289224ac6478aa861abd5222e",
+      "rows": 70,
+      "source": "tables/table_8.csv",
+      "transformation": "byte-for-byte aggregate copy"
+    }
+  ]
+}
