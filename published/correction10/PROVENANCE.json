@@ -1,0 +1,355 @@
+{
+  "schema_version": "1.0.0",
+  "release": "correction10-row-aligned-stage2",
+  "author_run_completed_at_utc": "2026-10-20T21:15:55.586657+00:00",
+  "author_run_registration_sha256": "21ff0a54a75cbb45f98008a074e3bfc0d271055726b58625b34ab5bdc31ea442",
+  "author_code_manifest_sha256": "04e0328c3d8114b49bd0bd742b28479b3eecacd35077f39707b20aeb123cfd20",
+  "analysis_plan_sha256": "fb90d3ebec275d48bac71a540c5816005701aa8fa4cf6863aab1eb230d1a873a",
+  "config_sha256": "4b9316e1128e5345b075137ccb297977c8ed40e019acf81e62b83680eb96c92e",
+  "completed_jobs": 180,
+  "stage2_refit_jobs": 50,
+  "imported_unchanged_jobs": 130,
+  "phases": {
+    "PHASE_REPORT_A_PREFLIGHT": {
+      "status": "pass",
+      "sha256": "5c88496221f2726df648d3723d2fa8ff896e733f94fa4479b7bb72b3585af7c1"
+    },
+    "PHASE_REPORT_B_ETL": {
+      "status": "pass",
+      "sha256": "2b6dfa2ea79c9fc7981337a38312a93d1945e764b8797e444f4c7df22d3291de"
+    },
+    "PHASE_REPORT_D_FULL": {
+      "status": "pass",
+      "sha256": "3b56f5f5a1ba227b912bd515c61297814f8284c7a4afac965445c7d68805b819"
+    },
+    "PHASE_REPORT_E_ANALYSIS": {
+      "status": "pass",
+      "sha256": "6c7fe7ac780850797db9e9af2fe08c88dd653fd8035f84bf610f9dc74b5a447b"
+    },
+    "PHASE_REPORT_F_EXPLAINABILITY": {
+      "status": "pass",
+      "sha256": "d33e7f31c300dbfb8354f7c44df5325379b0791928a5d73dbdfae63a27e70cdb"
+    },
+    "PHASE_REPORT_G_REPORTING": {
+      "status": "pass",
+      "sha256": "50ff45b78d5448b09cf0f151d565e7b2a53d3827dae129f46920e2624132637e"
+    }
+  },
+  "how_produced": "Correction09 trained all 180 jobs. Correction10 fixed the row alignment of training embeddings in stage 2: the 50 Mamba-derived jobs (Mamba-z-only, Hybrid-plain, MABOOST) reused their correction09 encoders and refitted stage 2, fusion, calibration and inference; the other 130 jobs were imported after hash verification; analysis, explanation and reporting were rerun.",
+  "publication_scope": "Aggregate statistics only; no patient rows, identifiers, per-stay predictions, checkpoints or raw data.",
+  "small_cell_rule": "Calibration bins with fewer than 11 stays are blanked; figure_4_reliability_calibration.pdf is withheld because it plots those bins.",
+  "artifacts": [
+    {
+      "file": "canonical/aggregate_metrics.csv",
+      "sha256": "03bf5915168a41232a18f23bb3db269500a803ed6d54f2f2a4246cf06a2d1c56",
+      "rows": 3024,
+      "source": "results/benchmark/canonical/aggregate_metrics.csv",
+      "source_sha256": "03bf5915168a41232a18f23bb3db269500a803ed6d54f2f2a4246cf06a2d1c56",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/canonical_analysis_report.json",
+      "sha256": "ac2442408d92d2ac702364c29eaf57e022ba6c1a1c977da0026fe521175433ea",
+      "rows": null,
+      "source": "results/benchmark/canonical/canonical_analysis_report.json",
+      "source_sha256": "ac2442408d92d2ac702364c29eaf57e022ba6c1a1c977da0026fe521175433ea",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/cohort_characteristics.csv",
+      "sha256": "cb102ba0a44c9a505a1483fbe6511cd9d2bda4a3b8c71d3ac54070596cf15e57",
+      "rows": 3,
+      "source": "results/benchmark/canonical/cohort_characteristics.csv",
+      "source_sha256": "cb102ba0a44c9a505a1483fbe6511cd9d2bda4a3b8c71d3ac54070596cf15e57",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/cohort_flow.csv",
+      "sha256": "d5c35ec13cddb22748cc8beafee2f3ab0b719c73de6fc1534959acf09ca1eb1c",
+      "rows": 30,
+      "source": "results/benchmark/canonical/cohort_flow.csv",
+      "source_sha256": "d5c35ec13cddb22748cc8beafee2f3ab0b719c73de6fc1534959acf09ca1eb1c",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/inference_counts.csv",
+      "sha256": "c1bc8e7217f82597fa5b45cc2e1ddc0ff3585b50848e41f6f8a643eb5d3ff089",
+      "rows": 60,
+      "source": "results/benchmark/canonical/inference_counts.csv",
+      "source_sha256": "c1bc8e7217f82597fa5b45cc2e1ddc0ff3585b50848e41f6f8a643eb5d3ff089",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/measurement_shift_smd.csv",
+      "sha256": "9820643746f2683718b6e0c13bd8d4216d296deba978d6df0614cbface9f6742",
+      "rows": 208,
+      "source": "results/benchmark/canonical/measurement_shift_smd.csv",
+      "source_sha256": "9820643746f2683718b6e0c13bd8d4216d296deba978d6df0614cbface9f6742",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/model_registry.csv",
+      "sha256": "0a8c37649cfbec22804d7261ef766f8b7f1391326eac6386414d121a651b1579",
+      "rows": 14,
+      "source": "results/benchmark/canonical/model_registry.csv",
+      "source_sha256": "0a8c37649cfbec22804d7261ef766f8b7f1391326eac6386414d121a651b1579",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/per_seed_metrics.csv",
+      "sha256": "971908084b46b8ac6bc9560ea39058e6a2a6e7bcb290e5c69228db8a27894cff",
+      "rows": 15120,
+      "source": "results/benchmark/canonical/per_seed_metrics.csv",
+      "source_sha256": "971908084b46b8ac6bc9560ea39058e6a2a6e7bcb290e5c69228db8a27894cff",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/primary_contrasts.csv",
+      "sha256": "336c883d0bf5576ecb8b911270d54d9b766c073d27e0230f314601229053576a",
+      "rows": 420,
+      "source": "results/benchmark/canonical/primary_contrasts.csv",
+      "source_sha256": "336c883d0bf5576ecb8b911270d54d9b766c073d27e0230f314601229053576a",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/seed_level_bootstrap_forest.csv",
+      "sha256": "ceaf3ff1ad04ba7eed11c7e793469eacbd6deec023637166e36f9bd135a59aa9",
+      "rows": 60,
+      "source": "results/benchmark/canonical/seed_level_bootstrap_forest.csv",
+      "source_sha256": "ceaf3ff1ad04ba7eed11c7e793469eacbd6deec023637166e36f9bd135a59aa9",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "canonical/subgroups.csv",
+      "sha256": "08e49f3e204015b387a810aab183f0b050f518628bf7dfee02bfb584630a47ff",
+      "rows": 72,
+      "source": "results/benchmark/canonical/subgroups.csv",
+      "source_sha256": "08e49f3e204015b387a810aab183f0b050f518628bf7dfee02bfb584630a47ff",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/reliability_bins.csv",
+      "sha256": "112616cc26a335b3342bc32cb31b42180670de1bdb0ba7b9a31abae737670f9d",
+      "rows": 60,
+      "source": "results/benchmark/tables/reliability_bins.csv",
+      "source_sha256": "d180d1ec497e114eea005467ec8e3ac17e7f44f667cc4db240c527c32c170afb",
+      "transformation": "bins with fewer than 11 stays blanked (stays, mean_predicted, observed)"
+    },
+    {
+      "file": "tables/supplement_carevue.csv",
+      "sha256": "9e9b353ef40eec7e54d121585f9a12985743e9695f2a9f7f376bedd2ad8a612f",
+      "rows": 5040,
+      "source": "results/benchmark/tables/supplement_carevue.csv",
+      "source_sha256": "9e9b353ef40eec7e54d121585f9a12985743e9695f2a9f7f376bedd2ad8a612f",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/supplement_complete_stress.csv",
+      "sha256": "e1e46898676852f6c02503b25ef1ee6f88fd6f019eb9c3043decc9ce3e1233fe",
+      "rows": 15120,
+      "source": "results/benchmark/tables/supplement_complete_stress.csv",
+      "source_sha256": "e1e46898676852f6c02503b25ef1ee6f88fd6f019eb9c3043decc9ce3e1233fe",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/supplement_stress_dictionary.csv",
+      "sha256": "79f1a0d62bb43d6abd9acdf18b12ac209fdcae391882fc9c237eec5c7d999166",
+      "rows": 28,
+      "source": "results/benchmark/tables/supplement_stress_dictionary.csv",
+      "source_sha256": "79f1a0d62bb43d6abd9acdf18b12ac209fdcae391882fc9c237eec5c7d999166",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/supplement_subgroups.csv",
+      "sha256": "69e1d5a0dbe7e97bebd84cd0f6d09c46afeacbf4a821c79fbf4d5df68c1d22e8",
+      "rows": 72,
+      "source": "results/benchmark/tables/supplement_subgroups.csv",
+      "source_sha256": "69e1d5a0dbe7e97bebd84cd0f6d09c46afeacbf4a821c79fbf4d5df68c1d22e8",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_1_cohort_shift.csv",
+      "sha256": "3824cb361becb60e3dee17ee778b024aa8400da52c5db5967be5bb3b19bcba04",
+      "rows": 3,
+      "source": "results/benchmark/tables/table_1_cohort_shift.csv",
+      "source_sha256": "3824cb361becb60e3dee17ee778b024aa8400da52c5db5967be5bb3b19bcba04",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_2_model_registry.csv",
+      "sha256": "2bcd9141c217be60e3abd39e543f75ebd5989229435b5d3ee4861198d4217aad",
+      "rows": 14,
+      "source": "results/benchmark/tables/table_2_model_registry.csv",
+      "source_sha256": "2bcd9141c217be60e3abd39e543f75ebd5989229435b5d3ee4861198d4217aad",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_3A_mortality.csv",
+      "sha256": "392d2856c2e8b608aff92dd13d25b02ab565f772cba4051a78f6bb69e423fd6f",
+      "rows": 42,
+      "source": "results/benchmark/tables/table_3A_mortality.csv",
+      "source_sha256": "392d2856c2e8b608aff92dd13d25b02ab565f772cba4051a78f6bb69e423fd6f",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_3B_mortality.csv",
+      "sha256": "9045c7d4e311c90161b85e023729cbc008d1a20af6595a0bdca129531cbce72a",
+      "rows": 42,
+      "source": "results/benchmark/tables/table_3B_mortality.csv",
+      "source_sha256": "9045c7d4e311c90161b85e023729cbc008d1a20af6595a0bdca129531cbce72a",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_4.csv",
+      "sha256": "13165e75c6b1c38cfa6bbdca319f4f57a707a66b1d4f22ea4b732d8c08fd9197",
+      "rows": 6,
+      "source": "results/benchmark/tables/table_4.csv",
+      "source_sha256": "13165e75c6b1c38cfa6bbdca319f4f57a707a66b1d4f22ea4b732d8c08fd9197",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_5.csv",
+      "sha256": "296ee1fa862477e00a1ce07b54767021346bf5e1d58c18cc7eb6b197c11cbb6e",
+      "rows": 96,
+      "source": "results/benchmark/tables/table_5.csv",
+      "source_sha256": "296ee1fa862477e00a1ce07b54767021346bf5e1d58c18cc7eb6b197c11cbb6e",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_6.csv",
+      "sha256": "46f8ce2b17eca6543c7a2f624e990dfcbc2c54ecb9c407131c84234d170ddae5",
+      "rows": 56,
+      "source": "results/benchmark/tables/table_6.csv",
+      "source_sha256": "46f8ce2b17eca6543c7a2f624e990dfcbc2c54ecb9c407131c84234d170ddae5",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_7.csv",
+      "sha256": "baa08b1538f872072cf6022c58310964b7570b5462f1b3e5e1dbd37e802c5b58",
+      "rows": 26,
+      "source": "results/benchmark/tables/table_7.csv",
+      "source_sha256": "baa08b1538f872072cf6022c58310964b7570b5462f1b3e5e1dbd37e802c5b58",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "tables/table_8.csv",
+      "sha256": "ca50c790e75af145fc643b13b800adb48d6ce8a6dc4e8515f50a2428a549ce9b",
+      "rows": 70,
+      "source": "results/benchmark/tables/table_8.csv",
+      "source_sha256": "ca50c790e75af145fc643b13b800adb48d6ce8a6dc4e8515f50a2428a549ce9b",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "explainability/explainability_report.json",
+      "sha256": "809ee9f1a49a8054b5d908512327f1bef64f4c87adfd306cec3f458d33dcdb6c",
+      "rows": null,
+      "source": "results/benchmark/explainability/explainability_report.json",
+      "source_sha256": "809ee9f1a49a8054b5d908512327f1bef64f4c87adfd306cec3f458d33dcdb6c",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "explainability/fusion_pathway_contributions.csv",
+      "sha256": "9cbedb294499ae22071d2f461d037fa810640989c439d0896da23efef597bc02",
+      "rows": 30,
+      "source": "results/benchmark/explainability/fusion_pathway_contributions.csv",
+      "source_sha256": "9cbedb294499ae22071d2f461d037fa810640989c439d0896da23efef597bc02",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "explainability/shap_feature_registry.csv",
+      "sha256": "2fce631e2874bdfea064df346141d73ced07d45db124ef8d4bf679b858007d5b",
+      "rows": 252,
+      "source": "results/benchmark/explainability/shap_feature_registry.csv",
+      "source_sha256": "2fce631e2874bdfea064df346141d73ced07d45db124ef8d4bf679b858007d5b",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "explainability/shap_importance_aggregate.csv",
+      "sha256": "62cb49caa4e9acb0e2959d48e45f4fb591d3c2e8143dfeb7a8c24c98ef996e84",
+      "rows": 252,
+      "source": "results/benchmark/explainability/shap_importance_aggregate.csv",
+      "source_sha256": "62cb49caa4e9acb0e2959d48e45f4fb591d3c2e8143dfeb7a8c24c98ef996e84",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "explainability/shap_importance_per_seed.csv",
+      "sha256": "a15b34a5479519a02151a50bfcb55eddb404164e09e933e2fb89fb4d38499889",
+      "rows": 2520,
+      "source": "results/benchmark/explainability/shap_importance_per_seed.csv",
+      "source_sha256": "a15b34a5479519a02151a50bfcb55eddb404164e09e933e2fb89fb4d38499889",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "explainability/table_7_shap_pathway_summary.csv",
+      "sha256": "94732d57f5bc584893cf5c74d6f2ebaa9495cacf01a382e2274b5f4f495eac39",
+      "rows": 26,
+      "source": "results/benchmark/explainability/table_7_shap_pathway_summary.csv",
+      "source_sha256": "94732d57f5bc584893cf5c74d6f2ebaa9495cacf01a382e2274b5f4f495eac39",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "explainability/temporal_feature_occlusion.csv",
+      "sha256": "11cdf6ae035227621351bd771e034def93fe67b5d9795a769319812b77467338",
+      "rows": 80,
+      "source": "results/benchmark/explainability/temporal_feature_occlusion.csv",
+      "source_sha256": "11cdf6ae035227621351bd771e034def93fe67b5d9795a769319812b77467338",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "figures/figure_1_landmark_cohort_flow.pdf",
+      "sha256": "a4b0e2d8f969d7e2ca6e27a06e3136fee38ce4cd27064c19e440dbe98b03f7fb",
+      "rows": null,
+      "source": "results/benchmark/figures/figure_1_landmark_cohort_flow.pdf",
+      "source_sha256": "a4b0e2d8f969d7e2ca6e27a06e3136fee38ce4cd27064c19e440dbe98b03f7fb",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "figures/figure_2_architecture_landmark_v13.pdf",
+      "sha256": "9b1fa641a5405148b631a46a1f57bbc8b7db0550c63f61cf8a870ab80d894c5a",
+      "rows": null,
+      "source": "results/benchmark/figures/figure_2_architecture_landmark_v13.pdf",
+      "source_sha256": "9b1fa641a5405148b631a46a1f57bbc8b7db0550c63f61cf8a870ab80d894c5a",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "figures/figure_3_stress_group_effect_coverage.pdf",
+      "sha256": "fbc8a50a85206079c999a960bb34877e4d4b96e6ae5543765da11e6e9fabd6de",
+      "rows": null,
+      "source": "results/benchmark/figures/figure_3_stress_group_effect_coverage.pdf",
+      "source_sha256": "fbc8a50a85206079c999a960bb34877e4d4b96e6ae5543765da11e6e9fabd6de",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "figures/figure_5_shap_pathways_occlusion.pdf",
+      "sha256": "05bab6a388559defe567fe490a75e21cedc14df800b46c05f9469245533f354e",
+      "rows": null,
+      "source": "results/benchmark/figures/figure_5_shap_pathways_occlusion.pdf",
+      "source_sha256": "05bab6a388559defe567fe490a75e21cedc14df800b46c05f9469245533f354e",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "figures/figure_5_shap_pathways_occlusion.png",
+      "sha256": "97b5ff1bddebe09bdd79c4dcdd0dc6a2d278364f82642ed3db2117d9a664006f",
+      "rows": null,
+      "source": "results/benchmark/figures/figure_5_shap_pathways_occlusion.png",
+      "source_sha256": "97b5ff1bddebe09bdd79c4dcdd0dc6a2d278364f82642ed3db2117d9a664006f",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "figures/figure_6_seed_level_bootstrap_forest.pdf",
+      "sha256": "a57ead0fa0873cebf714df18b262c06dd0adf90603244ffa99816ad50bc7b71a",
+      "rows": null,
+      "source": "results/benchmark/figures/figure_6_seed_level_bootstrap_forest.pdf",
+      "source_sha256": "a57ead0fa0873cebf714df18b262c06dd0adf90603244ffa99816ad50bc7b71a",
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "file": "etl/availability_filter_counts.csv",
+      "sha256": "4c47b5fbef403c4b282cd505c0b458c9dbb9ac8ec633d124b3f842837db0ac4d",
+      "rows": 12,
+      "source": "correction09 ETL audit (re-qualified identical in correction10)",
+      "source_sha256": "4c47b5fbef403c4b282cd505c0b458c9dbb9ac8ec633d124b3f842837db0ac4d",
+      "transformation": "byte-for-byte copy"
+    }
+  ]
+}

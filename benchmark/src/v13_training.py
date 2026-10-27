@@ -213,6 +213,7 @@ def make_loaders(
     longitudinal_train: bool = False,
     minimum_elapsed_hours: float = 2.0,
     maximum_anchors: int = 4,
+    shuffle_train: bool = True,
 ) -> dict[str, DataLoader]:
     generator = torch.Generator().manual_seed(seed)
     return {
@@ -226,10 +227,10 @@ def make_loaders(
                 maximum_anchors=maximum_anchors,
             ),
             batch_size=batch_size,
-            shuffle=split == "train",
+            shuffle=shuffle_train and split == "train",
             num_workers=0,
             pin_memory=True,
-            generator=generator if split == "train" else None,
+            generator=generator if shuffle_train and split == "train" else None,
         )
         for split, rows in indices.items()
     }
@@ -452,12 +453,15 @@ def train_mamba_encoder(
 ) -> tuple[nn.Module, dict[str, Any], dict[str, DataLoader]]:
     recipe = training_config or {}
     batch_size = int(recipe.get("batch_size", 32))
+    # Stage-2 joins these predictions/embeddings to index-ordered labels and
+    # tabular designs, so every inference split keeps index order.
     inference_loaders = make_loaders(
         arrays,
         indices,
         normalization,
         batch_size=batch_size,
         seed=seed,
+        shuffle_train=False,
     )
     training_loaders = make_loaders(
         arrays,
@@ -1404,6 +1408,10 @@ def train_xgb_or_mamba_primary(
             )
             for split in ("train", "validation", "test")
         }
+        for split, result in extracted.items():
+            # Stage-2 joins these rows positionally; refuse any misalignment.
+            if not np.array_equal(result["mortality"], labels[split]):
+                raise RuntimeError(f"stage-2 {split} embeddings are not row-aligned with labels")
         if model_name == "Mamba-z-only":
             designs = {split: result["embedding"] for split, result in extracted.items()}
         else:

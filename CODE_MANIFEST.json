@@ -176,7 +176,7 @@
     },
     {
       "file": "benchmark/src/v13_training.py",
-      "sha256": "b753be9463785682981b9e3f80d8d9ca5770ffbdf4a31a91e9cc5e9a013c8e26"
+      "sha256": "6e322498426fd66d1379ac1c3a7acec018eb09c6ed17e857a9a338784bbb4a9a"
     },
     {
       "file": "reproduce.py",
@@ -219,6 +219,10 @@
       "sha256": "68f1d2ad2c6c51b83aff7edb8e03801e7b094632f71f978d62620bfaf60a6d03"
     },
     {
+      "file": "tests/test_embedding_alignment.py",
+      "sha256": "121bc551a8dde1cefca859392421c589d10d515ec60fd37db9a6c3485f82ea2c"
+    },
+    {
       "file": "tests/test_ensemble.py",
       "sha256": "2ae9d4c18612feeecd9d079e9bac2bbf700f1b788deecc044d5e03938d88991d"
     },
@@ -236,7 +240,7 @@
     },
     {
       "file": "tools/render_results.py",
-      "sha256": "fa4f8c24c972ce33878a82820bf46c4f6e6f15e4bf1a227aacdeb69a2fd695e5"
+      "sha256": "6f14360370c325384bc6f3a2929f1de977db953da8d53576ee43a62e1d0df598"
     },
     {
       "file": "tools/synthetic_smoke.py",

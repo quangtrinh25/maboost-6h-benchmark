@@ -1,0 +1,38 @@
+{
+  "analysis_plan_sha256": "fb90d3ebec275d48bac71a540c5816005701aa8fa4cf6863aab1eb230d1a873a",
+  "approval_chain": {
+    "correction10_parent_import_sha256": "791468efe4872bed9fcaa1ed6f242216cfc4525215eddbfa896b84be0cc07d35",
+    "kernel_qualification_sha256": "b0018bfff2b8598af0ac4d3482084500acf8b2fb7d2e575263c3042fd3fe6da7",
+    "mode": "fresh_public_reproduction",
+    "phase_d_report_sha256": "3b56f5f5a1ba227b912bd515c61297814f8284c7a4afac965445c7d68805b819",
+    "qualified_threads": 16,
+    "run_registration_sha256": "21ff0a54a75cbb45f98008a074e3bfc0d271055726b58625b34ab5bdc31ea442"
+  },
+  "bootstrap_replicates": 10000,
+  "canonical_rows": 15120,
+  "config_sha256": "4b9316e1128e5345b075137ccb297977c8ed40e019acf81e62b83680eb96c92e",
+  "files": {
+    "aggregate_metrics.csv": "03bf5915168a41232a18f23bb3db269500a803ed6d54f2f2a4246cf06a2d1c56",
+    "cohort_characteristics.csv": "cb102ba0a44c9a505a1483fbe6511cd9d2bda4a3b8c71d3ac54070596cf15e57",
+    "cohort_flow.csv": "d5c35ec13cddb22748cc8beafee2f3ab0b719c73de6fc1534959acf09ca1eb1c",
+    "inference_counts.csv": "c1bc8e7217f82597fa5b45cc2e1ddc0ff3585b50848e41f6f8a643eb5d3ff089",
+    "measurement_shift_smd.csv": "9820643746f2683718b6e0c13bd8d4216d296deba978d6df0614cbface9f6742",
+    "model_registry.csv": "0a8c37649cfbec22804d7261ef766f8b7f1391326eac6386414d121a651b1579",
+    "per_seed_metrics.csv": "971908084b46b8ac6bc9560ea39058e6a2a6e7bcb290e5c69228db8a27894cff",
+    "primary_contrasts.csv": "336c883d0bf5576ecb8b911270d54d9b766c073d27e0230f314601229053576a",
+    "seed_level_bootstrap_forest.csv": "ceaf3ff1ad04ba7eed11c7e793469eacbd6deec023637166e36f9bd135a59aa9",
+    "subgroups.csv": "08e49f3e204015b387a810aab183f0b050f518628bf7dfee02bfb584630a47ff"
+  },
+  "implementation_correction_07_sha256": "0dab267721123534a9c1e77d108629a1a3c2d40dce61f70bca2b56fb9a6d8205",
+  "jobs": 180,
+  "manuscript_modified": false,
+  "patient_level_content": false,
+  "permutation_replicates": 10000,
+  "phase_d_completion_inventory_sha256": "059b86f8445670ab447fb9be0c8d67f493bccecc0b8fd45dba052cb4b5e753d5",
+  "phase_d_report_sha256": "3b56f5f5a1ba227b912bd515c61297814f8284c7a4afac965445c7d68805b819",
+  "primary_contrast_rows": 420,
+  "rust_build_manifest_sha256": "a1974e41690ff248a07cb2f4b074d65f9b8b974d0cdd3ad27f828074a0cb32d3",
+  "schema_version": "1.0.0",
+  "seed_inference_policy": "predictions ensembled per stay; seeds never treated as independent samples",
+  "status": "pass"
+}

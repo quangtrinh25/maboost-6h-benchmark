@@ -1,0 +1,153 @@
+{
+  "analysis_plan_sha256": "fb90d3ebec275d48bac71a540c5816005701aa8fa4cf6863aab1eb230d1a873a",
+  "config_sha256": "4b9316e1128e5345b075137ccb297977c8ed40e019acf81e62b83680eb96c92e",
+  "correction07_approval_chain": {
+    "correction10_parent_import_sha256": "791468efe4872bed9fcaa1ed6f242216cfc4525215eddbfa896b84be0cc07d35",
+    "kernel_qualification_sha256": "b0018bfff2b8598af0ac4d3482084500acf8b2fb7d2e575263c3042fd3fe6da7",
+    "mode": "fresh_public_reproduction",
+    "phase_d_report_sha256": "3b56f5f5a1ba227b912bd515c61297814f8284c7a4afac965445c7d68805b819",
+    "qualified_threads": 16,
+    "run_registration_sha256": "21ff0a54a75cbb45f98008a074e3bfc0d271055726b58625b34ab5bdc31ea442"
+  },
+  "figures": {
+    "figure_5_shap_pathways_occlusion.pdf": "05bab6a388559defe567fe490a75e21cedc14df800b46c05f9469245533f354e",
+    "figure_5_shap_pathways_occlusion.png": "97b5ff1bddebe09bdd79c4dcdd0dc6a2d278364f82642ed3db2117d9a664006f"
+  },
+  "files": {
+    "fusion_pathway_contributions.csv": "9cbedb294499ae22071d2f461d037fa810640989c439d0896da23efef597bc02",
+    "shap_feature_registry.csv": "2fce631e2874bdfea064df346141d73ced07d45db124ef8d4bf679b858007d5b",
+    "shap_importance_aggregate.csv": "62cb49caa4e9acb0e2959d48e45f4fb591d3c2e8143dfeb7a8c24c98ef996e84",
+    "shap_importance_per_seed.csv": "a15b34a5479519a02151a50bfcb55eddb404164e09e933e2fb89fb4d38499889",
+    "table_7_shap_pathway_summary.csv": "94732d57f5bc584893cf5c74d6f2ebaa9495cacf01a382e2274b5f4f495eac39",
+    "temporal_feature_occlusion.csv": "11cdf6ae035227621351bd771e034def93fe67b5d9795a769319812b77467338"
+  },
+  "interpretation_boundary": "TreeSHAP, w_k p_k pathway contributions, and occlusion are descriptive associations, not causal effects. Component contributions are computed before isotonic calibration and are not an additive decomposition of the calibrated probability.",
+  "jobs": [
+    {
+      "feature_count": 252,
+      "job_id": "mimic_iv__maboost__stress_augmented__seed42",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/mimic_iv__maboost__stress_augmented__seed42.npz",
+      "private_artifact_sha256": "157e93b069da98d4fe164e947ca8343ab0af81d3c0fc80acf24f37e506b5687c",
+      "sample_rows": 512,
+      "seed": 42,
+      "source_dataset": "mimic_iv",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "mimic_iv__maboost__stress_augmented__seed137",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/mimic_iv__maboost__stress_augmented__seed137.npz",
+      "private_artifact_sha256": "effe2f045667b45f8da19bb85318ddbf51939991f484e31bdbee5a358eec26fa",
+      "sample_rows": 512,
+      "seed": 137,
+      "source_dataset": "mimic_iv",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "mimic_iv__maboost__stress_augmented__seed2025",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/mimic_iv__maboost__stress_augmented__seed2025.npz",
+      "private_artifact_sha256": "ffdec6c5db3b2d3295059daf7c4ced6d1317b548f4e2930ed0e2896b2737e95f",
+      "sample_rows": 512,
+      "seed": 2025,
+      "source_dataset": "mimic_iv",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "mimic_iv__maboost__stress_augmented__seed2718",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/mimic_iv__maboost__stress_augmented__seed2718.npz",
+      "private_artifact_sha256": "73c1147c52e928cb86be625d7d2b983ecd05bff0e838cfcd20ad29cd3c76266f",
+      "sample_rows": 512,
+      "seed": 2718,
+      "source_dataset": "mimic_iv",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "mimic_iv__maboost__stress_augmented__seed31415",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/mimic_iv__maboost__stress_augmented__seed31415.npz",
+      "private_artifact_sha256": "e947a623d892d2d855078354897d507d2d13e2bc5374eb611368c864a90ae344",
+      "sample_rows": 512,
+      "seed": 31415,
+      "source_dataset": "mimic_iv",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "eicu__maboost__stress_augmented__seed42",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/eicu__maboost__stress_augmented__seed42.npz",
+      "private_artifact_sha256": "3f1348babb49b38518881b847ad31e7e64aa64e4723d2adf32c9008d3e02b9eb",
+      "sample_rows": 512,
+      "seed": 42,
+      "source_dataset": "eicu",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "eicu__maboost__stress_augmented__seed137",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/eicu__maboost__stress_augmented__seed137.npz",
+      "private_artifact_sha256": "32e799e253349883f782323514e0ccdba8ef25c7dc1d94616131e86d02e05334",
+      "sample_rows": 512,
+      "seed": 137,
+      "source_dataset": "eicu",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "eicu__maboost__stress_augmented__seed2025",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/eicu__maboost__stress_augmented__seed2025.npz",
+      "private_artifact_sha256": "0a82a1522568a69c1d3e86c46b7ee7c65101707809d7cb959e8d39c450b8f5b6",
+      "sample_rows": 512,
+      "seed": 2025,
+      "source_dataset": "eicu",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "eicu__maboost__stress_augmented__seed2718",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/eicu__maboost__stress_augmented__seed2718.npz",
+      "private_artifact_sha256": "74e887cc0500071088fa18e8d578636c80057ff2dfd465f4628576e2eea50721",
+      "sample_rows": 512,
+      "seed": 2718,
+      "source_dataset": "eicu",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    },
+    {
+      "feature_count": 252,
+      "job_id": "eicu__maboost__stress_augmented__seed31415",
+      "pathway_contributions_before_isotonic_calibration": true,
+      "private_artifact": "benchmark/private/explainability/eicu__maboost__stress_augmented__seed31415.npz",
+      "private_artifact_sha256": "a3ba5b660f7d77692efee8f5245beab5248d9c4659a184f0cba37fe6a3d6e8b2",
+      "sample_rows": 512,
+      "seed": 31415,
+      "source_dataset": "eicu",
+      "target_information_used": false,
+      "tree_shap_scope": "Flat-head mortality direct-clinical pathway"
+    }
+  ],
+  "manuscript_modified": false,
+  "patient_level_content": false,
+  "phase_e_report_sha256": "6c7fe7ac780850797db9e9af2fe08c88dd653fd8035f84bf610f9dc74b5a447b",
+  "row_level_shap_and_predictions_private_only": true,
+  "schema_version": "1.0.0",
+  "status": "pass"
+}

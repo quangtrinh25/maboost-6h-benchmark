@@ -1,0 +1,15 @@
+name,family,role,trainer,mortality_task,los_task
+MABOOST,primary,Proposed,mamba_validation_selected_fusion,True,True
+Hybrid-plain,primary,Internal ablation,mamba_z_plus_raw_summary_static,True,True
+Mamba-z-only,primary,Internal ablation,mamba_z_only,True,True
+Flat-head,primary,Internal ablation,xgboost_flat_head,True,True
+XGBOOST-FLAT,primary,Internal comparator,xgboost_strict_flat,True,True
+XGBOOST-SUMMARY+STATIC,primary,Internal comparator,xgboost_summary_static,True,True
+GRU-D,deep_baseline,External architecture comparator,torch_grud,True,True
+LSTM,deep_baseline,External architecture comparator,torch_lstm,True,True
+Transformer,deep_baseline,External architecture comparator,torch_transformer,True,True
+TCN,deep_baseline,External architecture comparator,torch_tcn,True,True
+SAnD,deep_baseline,External architecture comparator,torch_sand,True,True
+STraTS,deep_baseline,External architecture comparator,torch_strats,True,True
+InterpNet,deep_baseline,External architecture comparator,torch_interpnet,True,True
+DuETT,deep_baseline,External architecture comparator,torch_duett,True,True

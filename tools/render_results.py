@@ -5,8 +5,8 @@ import hashlib
 import json
 
 ROOT = Path(__file__).resolve().parents[1]
-DATA = ROOT / "docs/benchmark/correction09"
-OUT = ROOT / "docs/figures"
+DATA = ROOT / "published/correction10"
+OUT = ROOT / "published/figures"
 ROUTES = [
     ("mimic_iv", "mimic_iv", "MIMIC-IV\ninternal"),
     ("mimic_iv", "eicu", "MIMIC-IV\nto eICU"),
@@ -25,7 +25,7 @@ def verify():
             raise RuntimeError(f"Missing/unsafe aggregate asset: {record['file']}")
         if hashlib.sha256(path.read_bytes()).hexdigest() != record["sha256"]:
             raise RuntimeError(f"Aggregate asset hash mismatch: {record['file']}")
-    print(f"Verified {len(manifest['artifacts'])} aggregate assets from correction09.")
+    print(f"Verified {len(manifest['artifacts'])} aggregate assets from correction10.")
     return manifest
 
 
@@ -40,43 +40,11 @@ def save(fig, name):
     plt.close(fig)
 
 
-def architecture():
-    import matplotlib.pyplot as plt
-    from matplotlib.patches import FancyBboxPatch
-    fig, ax = plt.subplots(figsize=(16, 7.8))
-    ax.set(xlim=(0, 16), ylim=(0, 8)); ax.axis("off")
-    ax.text(.3, 7.65, "MABOOST  |  fixed-6-hour prediction", fontsize=23, weight="bold", color="#16324f")
-    ax.text(.3, 7.16, "A temporal–tabular model evaluated under observation stress and dataset shift", fontsize=13, color="#526474")
-
-    def box(x, y, w, h, title, body, color="#eaf2f8"):
-        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.06,rounding_size=0.12", facecolor=color, edgecolor="#b9cbd8", linewidth=1.2))
-        ax.text(x+w/2, y+h-.32, title, ha="center", va="top", fontsize=12.2, weight="bold", color="#16324f")
-        ax.text(x+w/2, y+(h-.42)/2, body, ha="center", va="center", fontsize=10.7, color="#334a5b", linespacing=1.6)
-
-    def arrow(x, y, u, v):
-        ax.annotate("", xy=(u, v), xytext=(x, y), arrowprops=dict(arrowstyle="-|>", color="#7791a2", lw=1.5, mutation_scale=14))
-
-    box(.3, 2.1, 3.0, 3.4, "FIXED LANDMARK", "Age ≥65\nAlive and in ICU at 6 h\n40 dynamic + 12 static features\nRecorded-time filtering\nwhere timestamps exist\nAt most 96 observed steps", "#edf5f3")
-    box(3.95, 4.7, 3.5, 1.5, "TEMPORAL ENCODER", "Values + masks + time gaps\nMamba → 512-D representation")
-    box(3.95, 2.75, 3.5, 1.5, "TABULAR FEATURES", "200 summaries + 12 static\n40 observedness rates (Flat-head)")
-    box(3.95, .8, 3.5, 1.45, "SOURCE TRAINING", "Full view + 6 augmentation views\nSame views in matched ablations", "#fff5df")
-    box(8.1, 4.8, 3.15, 1.4, "HYBRID", "512-D encoder + 212-D tabular\nXGBoost mortality / LOS heads")
-    box(8.1, 2.85, 3.15, 1.4, "XGBOOST-FLAT", "200 summary features\nMortality / LOS heads")
-    box(8.1, .9, 3.15, 1.4, "FLAT-HEAD", "200 summaries + 12 static\n+ 40 observedness rates")
-    box(12.05, 2.25, 3.5, 3.0, "SOURCE-SELECTED FUSION", "Separate mortality / LOS weights\nMortality isotonic calibration\n\nPost-landmark ICU death risk\nRemaining ICU LOS from 6 h", "#e3f2ef")
-    arrow(3.36, 4.8, 3.89, 5.4); arrow(3.36, 3.55, 3.89, 3.5)
-    arrow(7.51, 5.45, 8.04, 5.45)
-    arrow(7.51, 3.65, 8.04, 4.95); arrow(7.51, 3.5, 8.04, 3.5); arrow(7.51, 3.15, 8.04, 1.55)
-    for y in (5.45, 3.55, 1.55): arrow(11.31, y, 11.99, 3.75)
-    ax.text(.3, .22, "Source-only fitting and selection  •  Locked predictions before target-label evaluation  •  28 scenarios on the same 6 h risk set", fontsize=11, color="#526474")
-    save(fig, "architecture")
-
-
 def mortality_heatmap():
     import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
-    a = pd.read_csv(DATA / "aggregate_metrics.csv")
+    a = pd.read_csv(DATA / "canonical/aggregate_metrics.csv")
     models = [("MABOOST", "stress_augmented"), ("MABOOST", "full_only"),
               ("Hybrid-plain", "stress_augmented"), ("Hybrid-plain", "full_only"),
               ("XGBOOST-SUMMARY+STATIC", "stress_augmented"), ("XGBOOST-SUMMARY+STATIC", "full_only"),
@@ -110,7 +78,7 @@ def mortality_heatmap():
 def paired_effects():
     import matplotlib.pyplot as plt
     import pandas as pd
-    p = pd.read_csv(DATA / "primary_contrasts.csv")
+    p = pd.read_csv(DATA / "canonical/primary_contrasts.csv")
     fig, axes = plt.subplots(1, 2, figsize=(14, 7.5), sharey=True, sharex=True)
     comparisons = [("MABOOST_aug_vs_SUMMARY_STATIC_full", "vs summary+static · full-only", "#087f8c", -.13),
                    ("MABOOST_aug_vs_SUMMARY_STATIC_aug", "vs summary+static · augmented", "#d17927", .13)]
@@ -141,8 +109,8 @@ def los_and_fusion():
     import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
-    a = pd.read_csv(DATA / "aggregate_metrics.csv")
-    f = pd.read_csv(DATA / "fusion_pathway_contributions.csv")
+    a = pd.read_csv(DATA / "canonical/aggregate_metrics.csv")
+    f = pd.read_csv(DATA / "explainability/fusion_pathway_contributions.csv")
     fig, axes = plt.subplots(1, 2, figsize=(14, 6.5), gridspec_kw={"width_ratios": [1.3, 1]})
     ax = axes[0]
     for i, (source, target, _) in enumerate(ROUTES):
@@ -181,10 +149,10 @@ def main():
     if args.verify_only: return
     import matplotlib
     matplotlib.use("Agg")
-    matplotlib.rcParams.update({"font.family": "DejaVu Sans", "svg.hashsalt": "maboost-correction09", "font.size": 11})
+    matplotlib.rcParams.update({"font.family": "DejaVu Sans", "svg.hashsalt": "maboost-correction10", "font.size": 11})
     OUT.mkdir(parents=True, exist_ok=True)
-    architecture(); mortality_heatmap(); paired_effects(); los_and_fusion()
-    print(f"Rendered 4 figures (PNG + SVG) to {OUT.relative_to(ROOT)}")
+    mortality_heatmap(); paired_effects(); los_and_fusion()
+    print(f"Rendered 3 figures (PNG + SVG) to {OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__": main()

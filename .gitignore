@@ -34,6 +34,8 @@ venv/
 .pytest_cache/
 
 # Explicitly reviewed aggregate publication assets only.
-!/docs/benchmark/correction09/*.csv
-!/docs/figures/*.png
-!/docs/figures/*.svg
+!/published/correction10/**/*.csv
+!/published/correction10/figures/*.pdf
+!/published/correction10/figures/*.png
+!/published/figures/*.png
+!/published/figures/*.svg
